@@ -1,27 +1,25 @@
+import { wait } from "@testing-library/user-event/dist/utils";
 import { useEffect, useState } from "react";
 import { supabase } from "./supabase_client";
 
 const PlayerList = () => {
-  const [totalPlayers, setTotalPlayers] = useState();
+  const [totalPlayers, setTotalPlayers] = useState([]);
   const retrievePlayer = async () => {
-    const { data, error } = await supabase
+    const { data } = await supabase
       .from("Players")
       .select("name")
       .eq("roomID", 1234);
-    const playerList = data.map((element) => (
-      <li key={element.name}>{element.name}</li>
-    ));
-    setTotalPlayers(playerList);
+    setTotalPlayers(data);
   };
-  retrievePlayer();
-  // const array1 = [1, 4, 9, 16];
-  // const playerList = array1.map((x) => x * 2);
-  // console.log("mayo way", playerList);
+  useEffect(() => {
+    retrievePlayer();
+  }, []);
   return (
     <div>
-      <ul>{totalPlayers}</ul>
+      {totalPlayers.map((element) => (
+        <li key={element.name}>{element.name}</li>
+      ))}
     </div>
   );
 };
-
 export default PlayerList;

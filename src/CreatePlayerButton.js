@@ -10,9 +10,7 @@ const CreatePlayerButton = (props) => {
   };
   const handleClick = async () => {
     setPlayer(hasUserInput);
-    const username = player;
-    console.log(username);
-    let { error, status } = await supabase
+    const { error, status } = await supabase
       .from("Players")
       .insert([{ name: hasUserInput }]);
   };

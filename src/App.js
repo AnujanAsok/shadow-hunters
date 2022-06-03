@@ -12,14 +12,10 @@ function App() {
     <div className="App">
       <div>
         {page === "home" && (
-          <HomePage
-            player={player}
-            setPlayer={setPlayer}
-            setPage={setPage}
-          ></HomePage>
+          <HomePage player={player} setPlayer={setPlayer} setPage={setPage} />
         )}
-        {page === "game" && <GamePage></GamePage>}
-        {page === "lobby" && <LobbyPage></LobbyPage>}
+        {page === "game" && <GamePage />}
+        {page === "lobby" && <LobbyPage />}
       </div>
     </div>
   );

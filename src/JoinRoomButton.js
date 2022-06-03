@@ -8,7 +8,6 @@ const JoinRoomButton = (props) => {
       .from("Players")
       .update({ roomID: roomID })
       .match({ name: player });
-    console.log(error);
     setPage("lobby");
   };
   return (
