@@ -3,26 +3,27 @@ import { useEffect, useState } from "react";
 import JoinRoomButton from "./JoinRoomButton";
 
 const CreatePlayerButton = (props) => {
-  const [hasUserInput, setHasUserInput] = useState();
+  const [usernameInput, setUsernameInput] = useState();
   const { player, setPlayer, setPage } = props;
   const onChange = (e) => {
-    setHasUserInput(e.target.value);
+    setUsernameInput(e.target.value);
   };
   const handleClick = async () => {
-    setPlayer(hasUserInput);
+    setPlayer(usernameInput);
     const { error, status } = await supabase
       .from("Players")
-      .insert([{ name: hasUserInput }]);
+      .insert([{ name: usernameInput }]);
   };
   return (
     <div>
-      {player === "" && (
-        <div>
-          <label> Enter Username: </label>
-          <input type="text" onChange={onChange} />
-          <button onClick={handleClick}>Set Username</button>
-        </div>
-      )}
+      <div>
+        <label> Enter Username: </label>
+        <input type="text" onChange={onChange} disabled={player !== ""} />
+        <button onClick={handleClick} disabled={player !== ""}>
+          Set Username
+        </button>
+      </div>
+
       <div>
         <JoinRoomButton player={player} setPage={setPage}></JoinRoomButton>
       </div>
