@@ -1,31 +1,26 @@
 import logo from "./logo.svg";
 import "./App.css";
-import { supabase } from "./supabase_client";
+import HomePage from "./HomePage";
+import LobbyPage from "./LobbyPage";
+import GamePage from "./GamePage";
+import React, { useState } from "react";
 
 function App() {
-  const getProfile = async () => {
-    let { data, error, status } = await supabase
-      .from("initial-test")
-      .select(`color`);
-    console.log(data);
-  };
-  getProfile();
+  const [page, setPage] = useState("home");
+  const [player, setPlayer] = useState("");
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <div>
+        {page === "home" && (
+          <HomePage
+            player={player}
+            setPlayer={setPlayer}
+            setPage={setPage}
+          ></HomePage>
+        )}
+        {page === "game" && <GamePage></GamePage>}
+        {page === "lobby" && <LobbyPage></LobbyPage>}
+      </div>
     </div>
   );
 }
