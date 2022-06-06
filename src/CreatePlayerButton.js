@@ -1,6 +1,7 @@
 import { supabase } from "./supabase_client";
 import { useEffect, useState } from "react";
 import JoinRoomButton from "./JoinRoomButton";
+import CreateRoomButton from "./CreateRoomButton";
 
 const CreatePlayerButton = (props) => {
   const [usernameInput, setUsernameInput] = useState();
@@ -23,7 +24,9 @@ const CreatePlayerButton = (props) => {
           Set Username
         </button>
       </div>
-
+      <div>
+        <CreateRoomButton player={player} setPage={setPage} />
+      </div>
       <div>
         <JoinRoomButton player={player} setPage={setPage}></JoinRoomButton>
       </div>
