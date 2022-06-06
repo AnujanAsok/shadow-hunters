@@ -8,14 +8,20 @@ import React, { useState } from "react";
 function App() {
   const [page, setPage] = useState("home");
   const [player, setPlayer] = useState("");
+  const [roomCode, setRoomCode] = useState("");
   return (
     <div className="App">
       <div>
         {page === "home" && (
-          <HomePage player={player} setPlayer={setPlayer} setPage={setPage} />
+          <HomePage
+            player={player}
+            setPlayer={setPlayer}
+            setPage={setPage}
+            setRoomCode={setRoomCode}
+          />
         )}
         {page === "game" && <GamePage />}
-        {page === "lobby" && <LobbyPage />}
+        {page === "lobby" && <LobbyPage roomCode={roomCode} />}
       </div>
     </div>
   );

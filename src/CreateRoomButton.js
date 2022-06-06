@@ -1,7 +1,7 @@
 import { supabase } from "./supabase_client";
 
 const CreateRoomButton = (props) => {
-  const { player, setPage } = props;
+  const { player, setPage, setRoomCode } = props;
   const handleClick = async () => {
     const roomKeys = "abcdefghijklmnopqrstuvwxyz";
     let roomID = "";
@@ -9,6 +9,7 @@ const CreateRoomButton = (props) => {
       roomID += roomKeys.charAt(Math.floor(Math.random() * roomKeys.length));
       roomID = roomID.toUpperCase();
     }
+    setRoomCode(roomID);
     const { data, error } = await supabase
       .from("Players")
       .update({ roomID: roomID })

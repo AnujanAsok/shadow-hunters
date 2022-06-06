@@ -1,13 +1,14 @@
 import { useEffect, useState } from "react";
 import { supabase } from "./supabase_client";
 
-const PlayerList = () => {
+const PlayerList = (props) => {
+  const { roomCode } = props;
   const [totalPlayers, setTotalPlayers] = useState([]);
   const retrievePlayer = async () => {
     const { data } = await supabase
       .from("Players")
       .select("name")
-      .eq("roomID", 1234);
+      .eq("roomID", roomCode);
     setTotalPlayers(data);
   };
   useEffect(() => {

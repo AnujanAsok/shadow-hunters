@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "./supabase_client";
 
 const JoinRoomButton = (props) => {
-  const { player, setPage } = props;
+  const { player, setPage, setRoomCode } = props;
   const [userRoomInput, setUserRoomInput] = useState();
   const [roomExists, setRoomExists] = useState(true);
   const onChange = (e) => {
@@ -25,6 +25,7 @@ const JoinRoomButton = (props) => {
       lobby = "home";
     }
     setPage(lobby);
+    setRoomCode(userRoomInput);
   };
   return (
     <div>
