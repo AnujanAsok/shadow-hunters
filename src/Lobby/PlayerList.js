@@ -10,22 +10,20 @@ const PlayerList = (props) => {
       .from("Players")
       .select("name")
       .eq("roomID", roomCode);
-    console.log("data: ", data);
+
     const playerNames = data.map((element) => {
       return element.name;
     });
-    console.log("names: ", playerNames);
+
     setTotalPlayers(playerNames);
   };
   useEffect(() => {
     retrievePlayer();
-    console.log("total player after retrieve", totalPlayers);
+
     let mySubscription = supabase
       .from("Players")
       .on("UPDATE", (payload) => {
-        console.log("real time updates: ", payload.new.roomID);
         if (payload.new.roomID === roomCode) {
-          console.log("total players in sub callback: ", totalPlayers);
           setTotalPlayers((totalPlayers) =>
             totalPlayers.concat(payload.new.name)
           );
@@ -33,7 +31,7 @@ const PlayerList = (props) => {
       })
       .subscribe();
   }, []);
-  console.log(totalPlayers);
+
   return (
     <div>
       {totalPlayers.map((element) => (
