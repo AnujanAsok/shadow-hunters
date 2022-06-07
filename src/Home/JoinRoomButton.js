@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { supabase } from "./supabase_client";
+import { supabase } from "../supabase_client";
 
 const JoinRoomButton = (props) => {
   const { player, setPage, setRoomCode } = props;

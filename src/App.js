@@ -1,8 +1,8 @@
 import logo from "./logo.svg";
 import "./App.css";
-import HomePage from "./HomePage";
-import LobbyPage from "./LobbyPage";
-import GamePage from "./GamePage";
+import HomePage from "./Home/HomePage";
+import LobbyPage from "./Lobby/LobbyPage";
+import GamePage from "./Game/GamePage";
 import React, { useState } from "react";
 
 function App() {

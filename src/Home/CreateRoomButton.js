@@ -1,4 +1,4 @@
-import { supabase } from "./supabase_client";
+import { supabase } from "../supabase_client";
 
 const CreateRoomButton = (props) => {
   const { player, setPage, setRoomCode } = props;

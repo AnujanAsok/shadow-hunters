@@ -1,4 +1,4 @@
-import { supabase } from "./supabase_client";
+import { supabase } from "../supabase_client";
 import { useEffect, useState } from "react";
 import JoinRoomButton from "./JoinRoomButton";
 import CreateRoomButton from "./CreateRoomButton";
