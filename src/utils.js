@@ -1,4 +1,4 @@
-export const randomKeyGenerator = () => {
+export const generateRoomCode = () => {
   const roomKeys = "abcdefghijklmnopqrstuvwxyz";
   let roomID = "";
   for (let i = 0; i < 4; i++) {

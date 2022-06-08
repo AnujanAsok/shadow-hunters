@@ -33,10 +33,10 @@ const PlayerList = (props) => {
         }
       })
       .subscribe();
-    if (hasGameStarted === true) {
+    return () => {
       supabase.removeSubscription(mySubscription);
-    }
-  }, [hasGameStarted]);
+    };
+  }, []);
 
   return (
     <div>

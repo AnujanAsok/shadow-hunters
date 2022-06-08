@@ -1,10 +1,10 @@
 import { supabase } from "../supabase_client";
-import { randomKeyGenerator } from "../utils";
+import { generateRoomCode } from "../utils";
 
 const CreateRoomButton = (props) => {
   const { player, setPage, setRoomCode, setIsHost } = props;
   const handleClick = async () => {
-    const roomID = randomKeyGenerator();
+    const roomID = generateRoomCode();
     setRoomCode(roomID);
     const { data, error } = await supabase
       .from("Players")

@@ -13,6 +13,7 @@ const LobbyPage = (props) => {
       .update({ gameStatus: true })
       .match({ roomID: roomCode });
   };
+
   useEffect(() => {
     let gameStatusUpdate = supabase
       .from("Players:gameStatus=eq.true")
@@ -26,12 +27,14 @@ const LobbyPage = (props) => {
       })
       .subscribe();
     if (hasGameStarted === true) {
-      supabase.removeSubscription(gameStatusUpdate);
       pageSelect = "game";
     } else {
       pageSelect = "lobby";
     }
     setPage(pageSelect);
+    return () => {
+      supabase.removeSubscription(gameStatusUpdate);
+    };
   }, [hasGameStarted]);
 
   return (
