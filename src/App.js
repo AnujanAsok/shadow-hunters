@@ -9,6 +9,7 @@ function App() {
   const [page, setPage] = useState("home");
   const [player, setPlayer] = useState("");
   const [roomCode, setRoomCode] = useState("");
+  const [isHost, setIsHost] = useState(false);
   return (
     <div className="App">
       <div>
@@ -18,10 +19,13 @@ function App() {
             setPlayer={setPlayer}
             setPage={setPage}
             setRoomCode={setRoomCode}
+            setIsHost={setIsHost}
           />
         )}
         {page === "game" && <GamePage />}
-        {page === "lobby" && <LobbyPage roomCode={roomCode} />}
+        {page === "lobby" && (
+          <LobbyPage roomCode={roomCode} isHost={isHost} setPage={setPage} />
+        )}
       </div>
     </div>
   );

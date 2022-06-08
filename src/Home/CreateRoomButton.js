@@ -1,19 +1,16 @@
 import { supabase } from "../supabase_client";
+import { randomKeyGenerator } from "../utils";
 
 const CreateRoomButton = (props) => {
-  const { player, setPage, setRoomCode } = props;
+  const { player, setPage, setRoomCode, setIsHost } = props;
   const handleClick = async () => {
-    const roomKeys = "abcdefghijklmnopqrstuvwxyz";
-    let roomID = "";
-    for (let i = 0; i < 4; i++) {
-      roomID += roomKeys.charAt(Math.floor(Math.random() * roomKeys.length));
-      roomID = roomID.toUpperCase();
-    }
+    const roomID = randomKeyGenerator();
     setRoomCode(roomID);
     const { data, error } = await supabase
       .from("Players")
       .update({ roomID: roomID })
       .match({ name: player });
+    setIsHost(true);
     setPage("lobby");
   };
   return (

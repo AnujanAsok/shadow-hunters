@@ -2,10 +2,10 @@ import { useEffect, useState } from "react";
 import { supabase } from "../supabase_client";
 
 const PlayerList = (props) => {
-  const { roomCode } = props;
+  const { roomCode, hasGameStarted } = props;
   const [totalPlayers, setTotalPlayers] = useState([]);
 
-  const retrievePlayer = async () => {
+  const fetchPlayerNames = async () => {
     const { data } = await supabase
       .from("Players")
       .select("name")
@@ -18,25 +18,33 @@ const PlayerList = (props) => {
     setTotalPlayers(playerNames);
   };
   useEffect(() => {
-    retrievePlayer();
+    fetchPlayerNames();
 
     let mySubscription = supabase
       .from("Players")
       .on("UPDATE", (payload) => {
-        if (payload.new.roomID === roomCode) {
+        if (
+          payload.new.gameStatus === null &&
+          payload.new.roomID === roomCode
+        ) {
           setTotalPlayers((totalPlayers) =>
             totalPlayers.concat(payload.new.name)
           );
         }
       })
       .subscribe();
-  }, []);
+    if (hasGameStarted === true) {
+      supabase.removeSubscription(mySubscription);
+    }
+  }, [hasGameStarted]);
 
   return (
     <div>
-      {totalPlayers.map((element) => (
-        <li key={element}>{element}</li>
-      ))}
+      <ol>
+        {totalPlayers.map((element) => (
+          <li key={element}>{element}</li>
+        ))}
+      </ol>
     </div>
   );
 };

@@ -5,11 +5,13 @@ const JoinRoomButton = (props) => {
   const { player, setPage, setRoomCode } = props;
   const [userRoomInput, setUserRoomInput] = useState();
   const [roomExists, setRoomExists] = useState(true);
+
   const onChange = (e) => {
     setUserRoomInput(e.target.value);
   };
+
   const handleClick = async () => {
-    let lobby = "";
+    let pageSelect = "";
     const { data, error } = await supabase
       .from("Players")
       .select("roomID")
@@ -19,12 +21,12 @@ const JoinRoomButton = (props) => {
         .from("Players")
         .update({ roomID: userRoomInput })
         .match({ name: player });
-      lobby = "lobby";
+      pageSelect = "lobby";
     } else {
       setRoomExists(false);
-      lobby = "home";
+      pageSelect = "home";
     }
-    setPage(lobby);
+    setPage(pageSelect);
     setRoomCode(userRoomInput);
   };
   return (

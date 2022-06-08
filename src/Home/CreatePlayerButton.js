@@ -5,7 +5,7 @@ import CreateRoomButton from "./CreateRoomButton";
 
 const CreatePlayerButton = (props) => {
   const [usernameInput, setUsernameInput] = useState();
-  const { player, setPlayer, setPage, setRoomCode } = props;
+  const { player, setPlayer, setPage, setRoomCode, setIsHost } = props;
   const onChange = (e) => {
     setUsernameInput(e.target.value);
   };
@@ -24,20 +24,19 @@ const CreatePlayerButton = (props) => {
           Set Username
         </button>
       </div>
-      <div>
-        <CreateRoomButton
-          player={player}
-          setPage={setPage}
-          setRoomCode={setRoomCode}
-        />
-      </div>
-      <div>
-        <JoinRoomButton
-          player={player}
-          setPage={setPage}
-          setRoomCode={setRoomCode}
-        />
-      </div>
+
+      <CreateRoomButton
+        player={player}
+        setPage={setPage}
+        setRoomCode={setRoomCode}
+        setIsHost={setIsHost}
+      />
+
+      <JoinRoomButton
+        player={player}
+        setPage={setPage}
+        setRoomCode={setRoomCode}
+      />
     </div>
   );
 };
