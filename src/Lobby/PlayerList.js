@@ -2,8 +2,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "../supabase_client";
 
 const PlayerList = (props) => {
-  const { roomCode, hasGameStarted } = props;
-  const [totalPlayers, setTotalPlayers] = useState([]);
+  const { roomCode, hasGameStarted, totalPlayers, setTotalPlayers } = props;
 
   const fetchPlayerNames = async () => {
     const { data } = await supabase
