@@ -5,7 +5,6 @@ const GamePage = (props) => {
   const { roomCode } = props;
   const [attackTarget, setAttackTarget] = useState("No Target");
   const [totalPlayersHp, setTotalPlayersHp] = useState([]);
-  const stateRef = useRef({ totalPlayersHp });
 
   const handleClick = async () => {
     const targetPlayer = totalPlayersHp.find(
@@ -19,10 +18,6 @@ const GamePage = (props) => {
         .eq("name", attackTarget);
     }
   };
-
-  useEffect(() => {
-    stateRef.current = { totalPlayersHp };
-  }, [totalPlayersHp]);
 
   useEffect(() => {
     const fetchHitpoints = async () => {
@@ -42,17 +37,19 @@ const GamePage = (props) => {
     let mySubscription = supabase
       .from("Players")
       .on("UPDATE", (payload) => {
-        const { totalPlayersHp } = stateRef.current;
-
-        const changeHitpoints = totalPlayersHp.map((playerData) => {
-          if (payload.new.name === playerData.name) {
-            return { name: payload.new.name, Hitpoints: payload.new.Hitpoints };
-          } else {
-            return { name: playerData.name, Hitpoints: playerData.Hitpoints };
-          }
+        setTotalPlayersHp((currentState) => {
+          const changeHitpoints = currentState.map((playerData) => {
+            if (payload.new.name === playerData.name) {
+              return {
+                name: payload.new.name,
+                Hitpoints: payload.new.Hitpoints,
+              };
+            } else {
+              return { name: playerData.name, Hitpoints: playerData.Hitpoints };
+            }
+          });
+          return changeHitpoints;
         });
-
-        setTotalPlayersHp(changeHitpoints);
       })
       .subscribe();
     return () => {
