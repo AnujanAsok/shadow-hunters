@@ -19,7 +19,6 @@ const LobbyPage = (props) => {
     let gameStatusUpdate = supabase
       .from(`Players:name=eq.${player}`)
       .on("UPDATE", (payload) => {
-        console.log("payload in lobby", payload);
         if (
           payload.new.gameStatus === true &&
           payload.new.roomID === roomCode

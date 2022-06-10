@@ -33,23 +33,27 @@ const GamePage = (props) => {
     fetchHitpoints();
   }, []);
 
+  const updateHitpointValues = (currentState, payload) => {
+    const changeHitpoints = currentState.map((playerData) => {
+      if (payload.new.name === playerData.name) {
+        return {
+          name: payload.new.name,
+          Hitpoints: payload.new.Hitpoints,
+        };
+      } else {
+        return playerData;
+      }
+    });
+    return changeHitpoints;
+  };
+
   useEffect(() => {
     let mySubscription = supabase
       .from("Players")
       .on("UPDATE", (payload) => {
-        setTotalPlayersHp((currentState) => {
-          const changeHitpoints = currentState.map((playerData) => {
-            if (payload.new.name === playerData.name) {
-              return {
-                name: payload.new.name,
-                Hitpoints: payload.new.Hitpoints,
-              };
-            } else {
-              return { name: playerData.name, Hitpoints: playerData.Hitpoints };
-            }
-          });
-          return changeHitpoints;
-        });
+        setTotalPlayersHp((currentState) =>
+          updateHitpointValues(currentState, payload)
+        );
       })
       .subscribe();
     return () => {
