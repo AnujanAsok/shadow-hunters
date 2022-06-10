@@ -3,7 +3,8 @@ import { supabase } from "../supabase_client";
 import PlayerList from "./PlayerList";
 
 const LobbyPage = (props) => {
-  const { roomCode, isHost, setPage } = props;
+  const { roomCode, isHost, setPage, totalPlayers, setTotalPlayers, player } =
+    props;
   const [hasGameStarted, setHasGameStarted] = useState(false);
   let pageSelect = "";
 
@@ -16,7 +17,7 @@ const LobbyPage = (props) => {
 
   useEffect(() => {
     let gameStatusUpdate = supabase
-      .from("Players:gameStatus=eq.true")
+      .from(`Players:name=eq.${player}`)
       .on("UPDATE", (payload) => {
         if (
           payload.new.gameStatus === true &&
@@ -41,7 +42,12 @@ const LobbyPage = (props) => {
     <div>
       <h1>This is the Lobby page.</h1>
       <h2>Room Code: {roomCode}</h2>
-      <PlayerList roomCode={roomCode} hasGameStarted={hasGameStarted} />
+      <PlayerList
+        roomCode={roomCode}
+        hasGameStarted={hasGameStarted}
+        totalPlayers={totalPlayers}
+        setTotalPlayers={setTotalPlayers}
+      />
       <div>
         {isHost === true && <button onClick={handleClick}>Start Game</button>}
       </div>
