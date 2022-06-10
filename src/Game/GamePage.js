@@ -1,16 +1,28 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { supabase } from "../supabase_client";
 
 const GamePage = (props) => {
-  const { roomCode, totalPlayers } = props;
-  const [attackTarget, setAttackTarget] = useState();
-  const [totalPlayersHp, setTotalPlayersHp] = useState(["hello"]);
+  const { roomCode } = props;
+  const [attackTarget, setAttackTarget] = useState("No Target");
+  const [totalPlayersHp, setTotalPlayersHp] = useState([]);
+  const stateRef = useRef({ totalPlayersHp });
 
-  const handleChange = (e) => {
-    setAttackTarget(e.target.value);
+  const handleClick = async () => {
+    const targetPlayer = totalPlayersHp.find(
+      (playerData) => playerData.name === attackTarget
+    );
+
+    if (targetPlayer !== undefined) {
+      const { data, error } = await supabase
+        .from("Players")
+        .update({ Hitpoints: targetPlayer.Hitpoints - 20 })
+        .eq("name", attackTarget);
+    }
   };
 
-  const handleClick = () => {};
+  useEffect(() => {
+    stateRef.current = { totalPlayersHp };
+  }, [totalPlayersHp]);
 
   useEffect(() => {
     const fetchHitpoints = async () => {
@@ -26,17 +38,12 @@ const GamePage = (props) => {
     fetchHitpoints();
   }, []);
 
-  useEffect(
-    () => console.log("DID STATE CHANGE? ", totalPlayersHp),
-    [totalPlayersHp]
-  );
-  useEffect(() => console.log("MY COMPONENT MOUNTED "), []);
   useEffect(() => {
     let mySubscription = supabase
-      .from("Players:gameStatus=eq.true")
+      .from("Players")
       .on("UPDATE", (payload) => {
-        console.log(payload);
-        console.log("State variable total players: ", totalPlayersHp);
+        const { totalPlayersHp } = stateRef.current;
+
         const changeHitpoints = totalPlayersHp.map((playerData) => {
           if (payload.new.name === playerData.name) {
             return { name: payload.new.name, Hitpoints: payload.new.Hitpoints };
@@ -44,24 +51,31 @@ const GamePage = (props) => {
             return { name: playerData.name, Hitpoints: playerData.Hitpoints };
           }
         });
-        console.log("results from hitpoint map ", changeHitpoints);
+
         setTotalPlayersHp(changeHitpoints);
       })
       .subscribe();
+    return () => {
+      supabase.removeSubscription(mySubscription);
+    };
   }, []);
   return (
     <div>
       <h1>This is the Game Page</h1>
       <div>
-        <select name="test" id="test" onChange={handleChange}>
-          {totalPlayersHp.map((element) => (
-            <option value={element.name} key={element.name}>
-              {element.name} HitPoints: {element.Hitpoints}
-            </option>
-          ))}
-        </select>
+        <input
+          type="text"
+          onChange={(e) => setAttackTarget(e.target.value)}
+        ></input>
         <button onClick={handleClick}>Attack</button>
       </div>
+      <ol>
+        {totalPlayersHp.map((element) => (
+          <li key={element.name}>
+            {element.name} HitPoints: {element.Hitpoints}
+          </li>
+        ))}
+      </ol>
     </div>
   );
 };
