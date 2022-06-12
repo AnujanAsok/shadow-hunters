@@ -3,8 +3,8 @@ import { supabase } from "../supabase_client";
 
 const GamePage = (props) => {
   const { roomCode } = props;
-  const [attackTarget, setAttackTarget] = useState("No Target");
   const [totalPlayersHp, setTotalPlayersHp] = useState([]);
+  const [attackTarget, setAttackTarget] = useState("Select a target");
 
   const handleClick = async () => {
     const targetPlayer = totalPlayersHp.find(
@@ -60,23 +60,33 @@ const GamePage = (props) => {
       supabase.removeSubscription(mySubscription);
     };
   }, []);
+
   return (
     <div>
       <h1>This is the Game Page</h1>
       <div>
-        <input
-          type="text"
-          onChange={(e) => setAttackTarget(e.target.value)}
-        ></input>
-        <button onClick={handleClick}>Attack</button>
+        <select
+          name="selectingAttackTarget"
+          id="selectingAttackTarget"
+          defaultValue={"Select a target"}
+          onChange={(e) => {
+            setAttackTarget(e.target.value);
+          }}
+        >
+          <option value={"Select a target"}>Select a target</option>
+          {totalPlayersHp.map((element) => (
+            <option value={element.name} key={element.name}>
+              {element.name} HitPoints: {element.Hitpoints}
+            </option>
+          ))}
+        </select>
+        <button
+          onClick={handleClick}
+          disabled={attackTarget === "Select a target"}
+        >
+          Attack
+        </button>
       </div>
-      <ol>
-        {totalPlayersHp.map((element) => (
-          <li key={element.name}>
-            {element.name} HitPoints: {element.Hitpoints}
-          </li>
-        ))}
-      </ol>
     </div>
   );
 };
