@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { supabase } from "../supabase_client";
 
 const GamePage = (props) => {
-  const { roomCode } = props;
+  const { roomCode, player } = props;
   const [totalPlayersHp, setTotalPlayersHp] = useState([]);
   const [attackTarget, setAttackTarget] = useState("Select a target");
 
@@ -24,7 +24,8 @@ const GamePage = (props) => {
       const { data, error } = await supabase
         .from("Players")
         .select("name, Hitpoints")
-        .eq("roomID", roomCode);
+        .eq("roomID", roomCode)
+        .neq("name", player);
       const playerHp = data.map((playerData) => {
         return { name: playerData.name, Hitpoints: playerData.Hitpoints };
       });
@@ -32,6 +33,10 @@ const GamePage = (props) => {
     };
     fetchHitpoints();
   }, []);
+
+  useEffect(() => {
+    console.log("total player hp state: ", totalPlayersHp);
+  }, [totalPlayersHp]);
 
   const updateHitpointValues = (currentState, payload) => {
     const changeHitpoints = currentState.map((playerData) => {

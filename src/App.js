@@ -21,9 +21,10 @@ function App() {
             setPage={setPage}
             setRoomCode={setRoomCode}
             setIsHost={setIsHost}
+            roomCode={roomCode}
           />
         )}
-        {page === "game" && <GamePage roomCode={roomCode} />}
+        {page === "game" && <GamePage roomCode={roomCode} player={player} />}
         {page === "lobby" && (
           <LobbyPage
             roomCode={roomCode}
