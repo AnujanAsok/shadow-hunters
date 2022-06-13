@@ -39,7 +39,7 @@ const JoinRoomButton = (props) => {
         ></input>
         <button onClick={handleClick}>Join Room</button>
       </div>
-      <div>{roomExists === false && <h2>That Room Does Not Exist</h2>}</div>
+      {roomExists === false && <h2>That Room Does Not Exist</h2>}
     </div>
   );
 };

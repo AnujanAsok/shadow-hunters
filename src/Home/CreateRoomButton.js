@@ -1,45 +1,40 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { supabase } from "../supabase_client";
 import { generateRoomCode } from "../utils";
 
 const CreateRoomButton = (props) => {
   const { player, setPage, setRoomCode, setIsHost, roomCode } = props;
-  let pageSelect = "home";
-  let hostSelect = false;
-  let roomSelect = null;
+  const [isRoomTaken, setIsRoomTaken] = useState(false);
 
-  const fetchRoomCodes = async () => {
-    const { data } = await supabase.from("Players").select("roomID");
-    const registeredRooms = data;
-    return registeredRooms;
+  const validRoomCode = async () => {
+    const roomID = generateRoomCode();
+    const { data, error } = await supabase
+      .from("Players")
+      .update({ roomID: roomID })
+      .match({ name: player });
+    setRoomCode(roomID);
+    return error;
   };
 
   const handleClick = async () => {
-    const roomID = generateRoomCode();
-    const registeredRooms = await fetchRoomCodes();
-    const existingRoomCode = registeredRooms.find(
-      (rooms) => rooms.roomID === roomID
-    );
-
-    if (existingRoomCode === undefined) {
-      const { data, error } = await supabase
-        .from("Players")
-        .update({ roomID: roomID })
-        .match({ name: player });
+    const checkRoomCode = await validRoomCode();
+    let pageSelect = "home";
+    let hostSelect = false;
+    if (checkRoomCode === null) {
       hostSelect = true;
-      roomSelect = roomID;
       pageSelect = "lobby";
     } else {
-      handleClick();
+      setIsRoomTaken(true);
     }
+
     setIsHost(hostSelect);
     setPage(pageSelect);
-    setRoomCode(roomSelect);
   };
 
   return (
     <div>
       <button onClick={handleClick}>Create Room</button>
+      {isRoomTaken === true && <h3>Room is in use, please try again</h3>}
     </div>
   );
 };
