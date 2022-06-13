@@ -4,7 +4,7 @@ import { supabase } from "../supabase_client";
 const JoinRoomButton = (props) => {
   const { player, setPage, setRoomCode } = props;
   const [userRoomInput, setUserRoomInput] = useState();
-  const [roomExists, setRoomExists] = useState(true);
+  const [roomExists, setRoomExists] = useState();
 
   const onChange = (e) => {
     setUserRoomInput(e.target.value);
@@ -12,6 +12,7 @@ const JoinRoomButton = (props) => {
 
   const handleClick = async () => {
     let pageSelect = "";
+    let isRoomValid = true;
     const { data, error } = await supabase
       .from("Players")
       .select("roomID")
@@ -23,9 +24,10 @@ const JoinRoomButton = (props) => {
         .match({ name: player });
       pageSelect = "lobby";
     } else {
-      setRoomExists(false);
+      isRoomValid = false;
       pageSelect = "home";
     }
+    setRoomExists(isRoomValid);
     setPage(pageSelect);
     setRoomCode(userRoomInput);
   };
@@ -39,7 +41,7 @@ const JoinRoomButton = (props) => {
         ></input>
         <button onClick={handleClick}>Join Room</button>
       </div>
-      <div>{roomExists === false && <h2>That Room Does Not Exist</h2>}</div>
+      {roomExists === false && <h2>That Room Does Not Exist</h2>}
     </div>
   );
 };
