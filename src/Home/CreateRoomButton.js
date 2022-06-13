@@ -4,7 +4,7 @@ import { generateRoomCode } from "../utils";
 
 const CreateRoomButton = (props) => {
   const { player, setPage, setRoomCode, setIsHost, roomCode } = props;
-  const [isRoomTaken, setIsRoomTaken] = useState(false);
+  const [isRoomTaken, setIsRoomTaken] = useState();
 
   const validRoomCode = async () => {
     const roomID = generateRoomCode();
@@ -20,13 +20,14 @@ const CreateRoomButton = (props) => {
     const checkRoomCode = await validRoomCode();
     let pageSelect = "home";
     let hostSelect = false;
+    let roomAlreadyExists = false;
     if (checkRoomCode === null) {
       hostSelect = true;
       pageSelect = "lobby";
     } else {
-      setIsRoomTaken(true);
+      roomAlreadyExists = true;
     }
-
+    setIsRoomTaken(roomAlreadyExists);
     setIsHost(hostSelect);
     setPage(pageSelect);
   };
@@ -34,7 +35,7 @@ const CreateRoomButton = (props) => {
   return (
     <div>
       <button onClick={handleClick}>Create Room</button>
-      {isRoomTaken === true && <h3>Room is in use, please try again</h3>}
+      {isRoomTaken === true && <h3>Room creation , please try again</h3>}
     </div>
   );
 };

@@ -5,7 +5,7 @@ import CreateRoomButton from "./CreateRoomButton";
 
 const CreatePlayerButton = (props) => {
   const [usernameInput, setUsernameInput] = useState();
-  const [usernameTaken, setUsernameTaken] = useState(false);
+  const [usernameTaken, setUsernameTaken] = useState();
   const { player, setPlayer, setPage, setRoomCode, setIsHost } = props;
 
   const onChange = (e) => {
@@ -13,14 +13,18 @@ const CreatePlayerButton = (props) => {
   };
 
   const handleClick = async () => {
+    let fetchUsername = "";
+    let isNameTaken = false;
     const { data, error, status } = await supabase
       .from("Players")
       .insert([{ name: usernameInput }]);
     if (error === null) {
-      setPlayer(usernameInput);
+      fetchUsername = usernameInput;
     } else {
-      setUsernameTaken(true);
+      isNameTaken = true;
     }
+    setPlayer(fetchUsername);
+    setUsernameTaken(isNameTaken);
   };
   return (
     <div>
@@ -30,11 +34,10 @@ const CreatePlayerButton = (props) => {
         <button onClick={handleClick} disabled={player !== ""}>
           Set Username
         </button>
-        <div>
-          {usernameTaken === true && player === "" && (
-            <h3>That username is taken, Please enter another name.</h3>
-          )}
-        </div>
+
+        {usernameTaken === true && player === "" && (
+          <h3>That username is taken, Please enter another name.</h3>
+        )}
       </div>
 
       <CreateRoomButton
