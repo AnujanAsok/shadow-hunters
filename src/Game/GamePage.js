@@ -5,8 +5,6 @@ const GamePage = (props) => {
   const { roomCode, player } = props;
   const [totalPlayersHp, setTotalPlayersHp] = useState([]);
   const [attackTarget, setAttackTarget] = useState("Select a target");
-  const [isPlayerOut, setIsPlayerOut] = useState(false);
-  const [winCondition, setWinCondition] = useState(false);
 
   const handleClick = async () => {
     const targetPlayer = totalPlayersHp.find(
@@ -42,18 +40,14 @@ const GamePage = (props) => {
   const isPlayerEliminated = myPlayerData && myPlayerData.Hitpoints === 0;
 
   const checkWinCondition = () => {
-    let hasPlayerWon = false;
     const eliminatedPlayers = totalPlayersHp.filter(
       (playerData) => playerData.Hitpoints === 0
     );
-    if (
+    return (
       eliminatedPlayers.length === totalPlayersHp.length - 1 &&
       totalPlayersHp.length !== 0 &&
       isPlayerEliminated === false
-    ) {
-      hasPlayerWon = true;
-    }
-    return hasPlayerWon;
+    );
   };
 
   const hasWon = useMemo(checkWinCondition, [totalPlayersHp]);
@@ -61,26 +55,16 @@ const GamePage = (props) => {
   const updateHitpointValues = (currentState, payload) => {
     const changeHitpoints = currentState.map((playerData) => {
       if (payload.new.name === playerData.name) {
-        if (payload.new.Hitpoints > 0) {
-          return {
-            name: payload.new.name,
-            Hitpoints: payload.new.Hitpoints,
-          };
-        } else {
-          return {
-            name: payload.new.name,
-            Hitpoints: 0,
-          };
-        }
+        return {
+          name: payload.new.name,
+          Hitpoints: payload.new.Hitpoints > 0 ? payload.new.Hitpoints : 0,
+        };
       } else {
         return playerData;
       }
     });
     return changeHitpoints;
   };
-  useEffect(() => {
-    console.log("total hp", totalPlayersHp);
-  }, [totalPlayersHp]);
 
   useEffect(() => {
     let mySubscription = supabase
@@ -122,7 +106,9 @@ const GamePage = (props) => {
         </select>
         <button
           onClick={handleClick}
-          disabled={attackTarget === "Select a target" || isPlayerOut === true}
+          disabled={
+            attackTarget === "Select a target" || isPlayerEliminated === true
+          }
         >
           Attack
         </button>
