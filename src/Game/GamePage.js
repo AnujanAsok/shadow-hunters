@@ -106,9 +106,7 @@ const GamePage = (props) => {
         </select>
         <button
           onClick={handleClick}
-          disabled={
-            attackTarget === "Select a target" || isPlayerEliminated === true
-          }
+          disabled={attackTarget === "Select a target" || isPlayerEliminated}
         >
           Attack
         </button>
