@@ -7,32 +7,34 @@ import React, { useState } from "react";
 
 function App() {
   const [page, setPage] = useState("home");
-  const [player, setPlayer] = useState("");
+  const [playerName, setPlayerName] = useState("");
   const [roomCode, setRoomCode] = useState("");
   const [isHost, setIsHost] = useState(false);
-  const [totalPlayers, setTotalPlayers] = useState([]);
+  const [totalPlayerNames, setTotalPlayerNames] = useState([]);
   return (
     <div className="App">
       <div>
         {page === "home" && (
           <HomePage
-            player={player}
-            setPlayer={setPlayer}
+            playerName={playerName}
+            setPlayerName={setPlayerName}
             setPage={setPage}
             setRoomCode={setRoomCode}
             setIsHost={setIsHost}
             roomCode={roomCode}
           />
         )}
-        {page === "game" && <GamePage roomCode={roomCode} player={player} />}
+        {page === "game" && (
+          <GamePage roomCode={roomCode} playerName={playerName} />
+        )}
         {page === "lobby" && (
           <LobbyPage
             roomCode={roomCode}
             isHost={isHost}
             setPage={setPage}
-            totalPlayers={totalPlayers}
-            setTotalPlayers={setTotalPlayers}
-            player={player}
+            totalPlayerNames={totalPlayerNames}
+            setTotalPlayerNames={setTotalPlayerNames}
+            playerName={playerName}
           />
         )}
       </div>

@@ -6,7 +6,7 @@ import CreateRoomButton from "./CreateRoomButton";
 const CreatePlayerButton = (props) => {
   const [usernameInput, setUsernameInput] = useState();
   const [usernameTaken, setUsernameTaken] = useState();
-  const { player, setPlayer, setPage, setRoomCode, setIsHost } = props;
+  const { playerName, setPlayerName, setPage, setRoomCode, setIsHost } = props;
 
   const onChange = (e) => {
     setUsernameInput(e.target.value);
@@ -23,32 +23,32 @@ const CreatePlayerButton = (props) => {
     } else {
       isNameTaken = true;
     }
-    setPlayer(fetchUsername);
+    setPlayerName(fetchUsername);
     setUsernameTaken(isNameTaken);
   };
   return (
     <div>
       <div>
         <label> Enter Username: </label>
-        <input type="text" onChange={onChange} disabled={player !== ""} />
-        <button onClick={handleClick} disabled={player !== ""}>
+        <input type="text" onChange={onChange} disabled={playerName !== ""} />
+        <button onClick={handleClick} disabled={playerName !== ""}>
           Set Username
         </button>
 
-        {usernameTaken === true && player === "" && (
+        {usernameTaken === true && playerName === "" && (
           <h3>That username is taken, Please enter another name.</h3>
         )}
       </div>
 
       <CreateRoomButton
-        player={player}
+        playerName={playerName}
         setPage={setPage}
         setRoomCode={setRoomCode}
         setIsHost={setIsHost}
       />
 
       <JoinRoomButton
-        player={player}
+        playerName={playerName}
         setPage={setPage}
         setRoomCode={setRoomCode}
       />

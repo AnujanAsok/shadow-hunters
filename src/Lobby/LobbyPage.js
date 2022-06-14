@@ -3,10 +3,15 @@ import { supabase } from "../supabase_client";
 import PlayerList from "./PlayerList";
 
 const LobbyPage = (props) => {
-  const { roomCode, isHost, setPage, totalPlayers, setTotalPlayers, player } =
-    props;
+  const {
+    roomCode,
+    isHost,
+    setPage,
+    totalPlayerNames,
+    setTotalPlayerNames,
+    playerName,
+  } = props;
   const [hasGameStarted, setHasGameStarted] = useState(false);
-  let pageSelect = "";
 
   const handleClick = async () => {
     const { data, error } = await supabase
@@ -17,7 +22,7 @@ const LobbyPage = (props) => {
 
   useEffect(() => {
     let gameStatusUpdate = supabase
-      .from(`Players:name=eq.${player}`)
+      .from(`Players:name=eq.${playerName}`)
       .on("UPDATE", (payload) => {
         if (
           payload.new.gameStatus === true &&
@@ -27,6 +32,8 @@ const LobbyPage = (props) => {
         }
       })
       .subscribe();
+
+    let pageSelect = "";
     if (hasGameStarted === true) {
       pageSelect = "game";
     } else {
@@ -45,8 +52,8 @@ const LobbyPage = (props) => {
       <PlayerList
         roomCode={roomCode}
         hasGameStarted={hasGameStarted}
-        totalPlayers={totalPlayers}
-        setTotalPlayers={setTotalPlayers}
+        totalPlayerNames={totalPlayerNames}
+        setTotalPlayerNames={setTotalPlayerNames}
       />
       <div>
         {isHost === true && <button onClick={handleClick}>Start Game</button>}

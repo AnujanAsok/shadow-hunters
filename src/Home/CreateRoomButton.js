@@ -3,7 +3,7 @@ import { supabase } from "../supabase_client";
 import { generateRoomCode } from "../utils";
 
 const CreateRoomButton = (props) => {
-  const { player, setPage, setRoomCode, setIsHost, roomCode } = props;
+  const { playerName, setPage, setRoomCode, setIsHost, roomCode } = props;
   const [isRoomTaken, setIsRoomTaken] = useState();
 
   const validRoomCode = async () => {
@@ -11,7 +11,7 @@ const CreateRoomButton = (props) => {
     const { data, error } = await supabase
       .from("Players")
       .update({ roomID: roomID })
-      .match({ name: player });
+      .match({ name: playerName });
     setRoomCode(roomID);
     return error;
   };
