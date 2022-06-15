@@ -8,7 +8,9 @@ const CreateRoomButton = (props) => {
 
   const validRoomCode = async () => {
     const roomID = generateRoomCode();
-    const { data, error } = await supabase
+    const { error } = await supabase.from("Rooms").insert({ roomID: roomID }); // fix this
+    console.log(error);
+    const { data } = await supabase
       .from("Players")
       .update({ roomID: roomID })
       .match({ name: playerName });

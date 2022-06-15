@@ -22,10 +22,7 @@ const PlayerList = (props) => {
     let mySubscription = supabase
       .from("Players")
       .on("UPDATE", (payload) => {
-        if (
-          payload.new.gameStatus === null &&
-          payload.new.roomID === roomCode
-        ) {
+        if (payload.new.roomID === roomCode) {
           setTotalPlayerNames((totalPlayerNames) =>
             totalPlayerNames.concat(payload.new.name)
           );

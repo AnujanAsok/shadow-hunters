@@ -3,27 +3,22 @@ import { supabase } from "../supabase_client";
 import PlayerList from "./PlayerList";
 
 const LobbyPage = (props) => {
-  const {
-    roomCode,
-    isHost,
-    setPage,
-    totalPlayerNames,
-    setTotalPlayerNames,
-    playerName,
-  } = props;
+  const { roomCode, isHost, setPage, totalPlayerNames, setTotalPlayerNames } =
+    props;
   const [hasGameStarted, setHasGameStarted] = useState(false);
 
   const handleClick = async () => {
     const { data, error } = await supabase
-      .from("Players")
+      .from("Rooms")
       .update({ gameStatus: true })
       .match({ roomID: roomCode });
   };
 
   useEffect(() => {
     let gameStatusUpdate = supabase
-      .from(`Players:name=eq.${playerName}`)
+      .from("Rooms")
       .on("UPDATE", (payload) => {
+        console.log(payload);
         if (
           payload.new.gameStatus === true &&
           payload.new.roomID === roomCode
@@ -32,17 +27,14 @@ const LobbyPage = (props) => {
         }
       })
       .subscribe();
-
-    let pageSelect = "";
-    if (hasGameStarted === true) {
-      pageSelect = "game";
-    } else {
-      pageSelect = "lobby";
-    }
-    setPage(pageSelect);
     return () => {
       supabase.removeSubscription(gameStatusUpdate);
     };
+  }, []);
+
+  useEffect(() => {
+    const pageSelect = hasGameStarted === true ? "game" : "lobby";
+    setPage(pageSelect);
   }, [hasGameStarted]);
 
   return (

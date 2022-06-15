@@ -3,7 +3,7 @@ import { supabase } from "../supabase_client";
 
 const GamePage = (props) => {
   const { roomCode, playerName } = props;
-  const [totalPlayerData, settotalPlayerData] = useState([]);
+  const [totalPlayerData, setTotalPlayerData] = useState([]);
   const [attackTarget, setAttackTarget] = useState("Select a target");
 
   const handleClick = async () => {
@@ -28,7 +28,7 @@ const GamePage = (props) => {
       const playerHp = data.map((playerData) => {
         return { name: playerData.name, Hitpoints: playerData.Hitpoints };
       });
-      settotalPlayerData(playerHp);
+      setTotalPlayerData(playerHp);
     };
     fetchHitpoints();
   }, []);
@@ -70,7 +70,7 @@ const GamePage = (props) => {
     let mySubscription = supabase
       .from("Players")
       .on("UPDATE", (payload) => {
-        settotalPlayerData((currentState) =>
+        setTotalPlayerData((currentState) =>
           updateHitpointValues(currentState, payload)
         );
       })
