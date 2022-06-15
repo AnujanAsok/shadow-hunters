@@ -2,12 +2,12 @@ import { useEffect, useState } from "react";
 import { supabase } from "../supabase_client";
 
 const JoinRoomButton = (props) => {
-  const { player, setPage, setRoomCode } = props;
-  const [userRoomInput, setUserRoomInput] = useState();
-  const [roomExists, setRoomExists] = useState();
+  const { playerName, setPage, setRoomCode } = props;
+  const [roomCodeInput, setRoomCodeInput] = useState();
+  const [doesRoomExist, setDoesRoomExist] = useState();
 
   const onChange = (e) => {
-    setUserRoomInput(e.target.value);
+    setRoomCodeInput(e.target.value);
   };
 
   const handleClick = async () => {
@@ -16,20 +16,20 @@ const JoinRoomButton = (props) => {
     const { data, error } = await supabase
       .from("Players")
       .select("roomID")
-      .match({ roomID: userRoomInput });
-    if (data[0] !== undefined && data[0].roomID === userRoomInput) {
+      .match({ roomID: roomCodeInput });
+    if (data[0] !== undefined && data[0].roomID === roomCodeInput) {
       const { data, error } = await supabase
         .from("Players")
-        .update({ roomID: userRoomInput })
-        .match({ name: player });
+        .update({ roomID: roomCodeInput })
+        .match({ name: playerName });
       pageSelect = "lobby";
     } else {
       isRoomValid = false;
       pageSelect = "home";
     }
-    setRoomExists(isRoomValid);
+    setDoesRoomExist(isRoomValid);
     setPage(pageSelect);
-    setRoomCode(userRoomInput);
+    setRoomCode(roomCodeInput);
   };
   return (
     <div>
@@ -41,7 +41,7 @@ const JoinRoomButton = (props) => {
         ></input>
         <button onClick={handleClick}>Join Room</button>
       </div>
-      {roomExists === false && <h2>That Room Does Not Exist</h2>}
+      {doesRoomExist === false && <h2>That Room Does Not Exist</h2>}
     </div>
   );
 };

@@ -3,22 +3,22 @@ import { supabase } from "../supabase_client";
 import PlayerList from "./PlayerList";
 
 const LobbyPage = (props) => {
-  const { roomCode, isHost, setPage, totalPlayers, setTotalPlayers, player } =
+  const { roomCode, isHost, setPage, totalPlayerNames, setTotalPlayerNames } =
     props;
   const [hasGameStarted, setHasGameStarted] = useState(false);
-  let pageSelect = "";
 
   const handleClick = async () => {
     const { data, error } = await supabase
-      .from("Players")
+      .from("Rooms")
       .update({ gameStatus: true })
       .match({ roomID: roomCode });
   };
 
   useEffect(() => {
     let gameStatusUpdate = supabase
-      .from(`Players:name=eq.${player}`)
+      .from("Rooms")
       .on("UPDATE", (payload) => {
+        console.log(payload);
         if (
           payload.new.gameStatus === true &&
           payload.new.roomID === roomCode
@@ -27,15 +27,14 @@ const LobbyPage = (props) => {
         }
       })
       .subscribe();
-    if (hasGameStarted === true) {
-      pageSelect = "game";
-    } else {
-      pageSelect = "lobby";
-    }
-    setPage(pageSelect);
     return () => {
       supabase.removeSubscription(gameStatusUpdate);
     };
+  }, []);
+
+  useEffect(() => {
+    const pageSelect = hasGameStarted === true ? "game" : "lobby";
+    setPage(pageSelect);
   }, [hasGameStarted]);
 
   return (
@@ -45,8 +44,8 @@ const LobbyPage = (props) => {
       <PlayerList
         roomCode={roomCode}
         hasGameStarted={hasGameStarted}
-        totalPlayers={totalPlayers}
-        setTotalPlayers={setTotalPlayers}
+        totalPlayerNames={totalPlayerNames}
+        setTotalPlayerNames={setTotalPlayerNames}
       />
       <div>
         {isHost === true && <button onClick={handleClick}>Start Game</button>}

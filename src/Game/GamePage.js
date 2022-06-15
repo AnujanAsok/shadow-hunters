@@ -2,12 +2,12 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { supabase } from "../supabase_client";
 
 const GamePage = (props) => {
-  const { roomCode, player } = props;
-  const [totalPlayersHp, setTotalPlayersHp] = useState([]);
+  const { roomCode, playerName } = props;
+  const [totalPlayerData, setTotalPlayerData] = useState([]);
   const [attackTarget, setAttackTarget] = useState("Select a target");
 
   const handleClick = async () => {
-    const targetPlayer = totalPlayersHp.find(
+    const targetPlayer = totalPlayerData.find(
       (playerData) => playerData.name === attackTarget
     );
 
@@ -28,32 +28,32 @@ const GamePage = (props) => {
       const playerHp = data.map((playerData) => {
         return { name: playerData.name, Hitpoints: playerData.Hitpoints };
       });
-      setTotalPlayersHp(playerHp);
+      setTotalPlayerData(playerHp);
     };
     fetchHitpoints();
   }, []);
 
   const myPlayerData = useMemo(() => {
-    return totalPlayersHp.find((playerData) => playerData.name === player);
-  }, [totalPlayersHp]);
+    return totalPlayerData.find((playerData) => playerData.name === playerName);
+  }, [totalPlayerData]);
 
   const isPlayerEliminated = myPlayerData && myPlayerData.Hitpoints === 0;
 
   const checkWinCondition = () => {
-    const eliminatedPlayers = totalPlayersHp.filter(
+    const eliminatedPlayers = totalPlayerData.filter(
       (playerData) => playerData.Hitpoints === 0
     );
     return (
-      eliminatedPlayers.length === totalPlayersHp.length - 1 &&
-      totalPlayersHp.length !== 0 &&
+      eliminatedPlayers.length === totalPlayerData.length - 1 &&
+      totalPlayerData.length !== 0 &&
       isPlayerEliminated === false
     );
   };
 
-  const hasWon = useMemo(checkWinCondition, [totalPlayersHp]);
+  const hasWon = useMemo(checkWinCondition, [totalPlayerData]);
 
   const updateHitpointValues = (currentState, payload) => {
-    const changeHitpoints = currentState.map((playerData) => {
+    const updateHitpoints = currentState.map((playerData) => {
       if (payload.new.name === playerData.name) {
         return {
           name: payload.new.name,
@@ -63,14 +63,14 @@ const GamePage = (props) => {
         return playerData;
       }
     });
-    return changeHitpoints;
+    return updateHitpoints;
   };
 
   useEffect(() => {
     let mySubscription = supabase
       .from("Players")
       .on("UPDATE", (payload) => {
-        setTotalPlayersHp((currentState) =>
+        setTotalPlayerData((currentState) =>
           updateHitpointValues(currentState, payload)
         );
       })
@@ -81,8 +81,9 @@ const GamePage = (props) => {
   }, []);
 
   const filteredPlayerTargets = useMemo(
-    () => totalPlayersHp.filter((playerData) => playerData.name !== player),
-    [totalPlayersHp]
+    () =>
+      totalPlayerData.filter((playerData) => playerData.name !== playerName),
+    [totalPlayerData]
   );
 
   return (
@@ -98,9 +99,9 @@ const GamePage = (props) => {
           }}
         >
           <option value={"Select a target"}>Select a target</option>
-          {filteredPlayerTargets.map((element) => (
-            <option value={element.name} key={element.name}>
-              {element.name} HitPoints: {element.Hitpoints}
+          {filteredPlayerTargets.map((targetPlayers) => (
+            <option value={targetPlayers.name} key={targetPlayers.name}>
+              {targetPlayers.name} HitPoints: {targetPlayers.Hitpoints}
             </option>
           ))}
         </select>
@@ -110,7 +111,7 @@ const GamePage = (props) => {
         >
           Attack
         </button>
-        {isPlayerEliminated === true && <h3>You are out</h3>}
+        {isPlayerEliminated === true && <h3>You are dead.</h3>}
         {hasWon === true && <h3>You have won!</h3>}
       </div>
     </div>
