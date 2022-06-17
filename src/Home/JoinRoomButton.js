@@ -38,8 +38,11 @@ const JoinRoomButton = (props) => {
           type="text"
           onChange={onChange}
           placeholder="Enter existing room code"
+          className="input input2"
         ></input>
-        <button onClick={handleClick}>Join Room</button>
+        <button onClick={handleClick} className="button button3">
+          Join Room
+        </button>
       </div>
       {doesRoomExist === false && <h2>That Room Does Not Exist</h2>}
     </div>

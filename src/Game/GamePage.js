@@ -1,21 +1,32 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { supabase } from "../supabase_client";
+import "./Game.css";
 
 const GamePage = (props) => {
   const { roomCode, playerName } = props;
   const [totalPlayerData, setTotalPlayerData] = useState([]);
   const [attackTarget, setAttackTarget] = useState("Select a target");
+  const [currentTurnPlayer, setCurrentTurnPlayer] = useState(0);
 
   const handleClick = async () => {
     const targetPlayer = totalPlayerData.find(
       (playerData) => playerData.name === attackTarget
     );
 
+    console.log("current Turn", currentTurnPlayer);
+
     if (targetPlayer !== undefined) {
       const { data, error } = await supabase
         .from("Players")
         .update({ Hitpoints: targetPlayer.Hitpoints - 20 })
         .eq("name", attackTarget);
+
+      const validTurn =
+        currentTurnPlayer + 1 < totalPlayerData.length ? currentTurnPlayer : -1;
+      const turnUpdate = await supabase
+        .from("Rooms")
+        .update({ turnTracker: validTurn + 1 })
+        .eq("roomID", roomCode);
     }
   };
 
@@ -24,6 +35,7 @@ const GamePage = (props) => {
       const { data, error } = await supabase
         .from("Players")
         .select("name, Hitpoints")
+        .order("id", { ascending: false })
         .eq("roomID", roomCode);
       const playerHp = data.map((playerData) => {
         return { name: playerData.name, Hitpoints: playerData.Hitpoints };
@@ -36,6 +48,18 @@ const GamePage = (props) => {
   const myPlayerData = useMemo(() => {
     return totalPlayerData.find((playerData) => playerData.name === playerName);
   }, [totalPlayerData]);
+
+  const turnPlayer = useMemo(() => {
+    return totalPlayerData.find(
+      (playerData, index) => index === currentTurnPlayer
+    );
+  }, [currentTurnPlayer, totalPlayerData]);
+
+  const focusedPlayer = turnPlayer && turnPlayer.name === playerName;
+  console.log("total player data", totalPlayerData);
+  console.log("currentplayer", currentTurnPlayer);
+  console.log("turnPlayer", turnPlayer);
+  console.log("total player", focusedPlayer);
 
   const isPlayerEliminated = myPlayerData && myPlayerData.Hitpoints === 0;
 
@@ -54,12 +78,12 @@ const GamePage = (props) => {
 
   const updateHitpointValues = (currentState, payload) => {
     const updateHitpoints = currentState.map((playerData) => {
-      if (payload.new.name === playerData.name) {
+      if (payload.new.name === playerData.name && payload.table === "Players") {
         return {
           name: payload.new.name,
           Hitpoints: payload.new.Hitpoints > 0 ? payload.new.Hitpoints : 0,
         };
-      } else {
+      } else if (payload.table === "Players") {
         return playerData;
       }
     });
@@ -80,6 +104,19 @@ const GamePage = (props) => {
     };
   }, []);
 
+  useEffect(() => {
+    let turnSubscription = supabase
+      .from("Rooms")
+      .on("UPDATE", (payload) => {
+        console.log("turn payload", payload.new.turnTracker);
+        setCurrentTurnPlayer(payload.new.turnTracker);
+      })
+      .subscribe();
+    return () => {
+      supabase.removeSubscription(turnSubscription);
+    };
+  }, []);
+
   const filteredPlayerTargets = useMemo(
     () =>
       totalPlayerData.filter((playerData) => playerData.name !== playerName),
@@ -88,31 +125,39 @@ const GamePage = (props) => {
 
   return (
     <div>
-      <h1>This is the Game Page</h1>
-      <div>
-        <select
-          name="selectingAttackTarget"
-          id="selectingAttackTarget"
-          defaultValue={"Select a target"}
-          onChange={(e) => {
-            setAttackTarget(e.target.value);
-          }}
-        >
-          <option value={"Select a target"}>Select a target</option>
-          {filteredPlayerTargets.map((targetPlayers) => (
-            <option value={targetPlayers.name} key={targetPlayers.name}>
-              {targetPlayers.name} HitPoints: {targetPlayers.Hitpoints}
-            </option>
-          ))}
-        </select>
-        <button
-          onClick={handleClick}
-          disabled={attackTarget === "Select a target" || isPlayerEliminated}
-        >
-          Attack
-        </button>
-        {isPlayerEliminated === true && <h3>You are dead.</h3>}
-        {hasWon === true && <h3>You have won!</h3>}
+      <div className="inventoryContainer">Inventory:</div>
+      <div className="gamePageContainer">
+        <h1>This is the Game Page</h1>
+
+        <div>
+          <select
+            name="selectingAttackTarget"
+            id="selectingAttackTarget"
+            defaultValue={"Select a target"}
+            onChange={(e) => {
+              setAttackTarget(e.target.value);
+            }}
+          >
+            <option value={"Select a target"}>Select a target</option>
+            {filteredPlayerTargets.map((targetPlayers) => (
+              <option value={targetPlayers.name} key={targetPlayers.name}>
+                {targetPlayers.name} HitPoints: {targetPlayers.Hitpoints}
+              </option>
+            ))}
+          </select>
+          <button
+            onClick={handleClick}
+            disabled={
+              attackTarget === "Select a target" ||
+              isPlayerEliminated ||
+              !focusedPlayer
+            }
+          >
+            Attack
+          </button>
+          {isPlayerEliminated === true && <h3>You are dead.</h3>}
+          {hasWon === true && <h3>You have won!</h3>}
+        </div>
       </div>
     </div>
   );

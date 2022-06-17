@@ -3,6 +3,7 @@ import { supabase } from "../supabase_client";
 
 const PlayerList = (props) => {
   const { roomCode, totalPlayerNames, setTotalPlayerNames } = props;
+  const [playerReadyStatus, setPlayerReadyStatus] = useState();
 
   const fetchPlayerNames = async () => {
     const { data } = await supabase
@@ -35,12 +36,15 @@ const PlayerList = (props) => {
   }, []);
 
   return (
-    <div>
-      <ol>
+    <div className="playerListContainer">
+      <table>
         {totalPlayerNames.map((playerNames) => (
-          <li key={playerNames}>{playerNames}</li>
+          <tr className="tableBorder">
+            <td>{playerNames}</td>
+            <td>Ready</td>
+          </tr>
         ))}
-      </ol>
+      </table>
     </div>
   );
 };

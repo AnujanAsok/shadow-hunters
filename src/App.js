@@ -13,7 +13,7 @@ function App() {
   const [totalPlayerNames, setTotalPlayerNames] = useState([]);
   return (
     <div className="App">
-      <div>
+      <div style={{ width: "100%", height: "100%" }}>
         {page === "home" && (
           <HomePage
             playerName={playerName}

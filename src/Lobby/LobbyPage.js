@@ -1,10 +1,17 @@
 import { useEffect, useState } from "react";
 import { supabase } from "../supabase_client";
 import PlayerList from "./PlayerList";
+import "./Lobby.css";
 
 const LobbyPage = (props) => {
-  const { roomCode, isHost, setPage, totalPlayerNames, setTotalPlayerNames } =
-    props;
+  const {
+    roomCode,
+    isHost,
+    setPage,
+    totalPlayerNames,
+    setTotalPlayerNames,
+    playerName,
+  } = props;
   const [hasGameStarted, setHasGameStarted] = useState(false);
 
   const handleClick = async () => {
@@ -38,18 +45,27 @@ const LobbyPage = (props) => {
   }, [hasGameStarted]);
 
   return (
-    <div>
-      <h1>This is the Lobby page.</h1>
-      <h2>Room Code: {roomCode}</h2>
-      <PlayerList
-        roomCode={roomCode}
-        hasGameStarted={hasGameStarted}
-        totalPlayerNames={totalPlayerNames}
-        setTotalPlayerNames={setTotalPlayerNames}
-      />
-      <div>
-        {isHost === true && <button onClick={handleClick}>Start Game</button>}
+    <div style={{ display: "flex", width: "100%", height: "100%" }}>
+      <div style={{ backgroundColor: "white", flex: 1 }}></div>
+      <div className="lobbyContainer">
+        <h1>This is the Lobby page.</h1>
+        <h2 style={{ borderStyle: "dashed" }}>Room Code: {roomCode}</h2>
+        <PlayerList
+          roomCode={roomCode}
+          hasGameStarted={hasGameStarted}
+          totalPlayerNames={totalPlayerNames}
+          setTotalPlayerNames={setTotalPlayerNames}
+        />
+        <div>
+          {isHost === true && (
+            <button onClick={handleClick} className="button button3">
+              Start Game
+            </button>
+          )}
+        </div>
       </div>
+
+      <div style={{ backgroundColor: "white", flex: 1 }}></div>
     </div>
   );
 };
