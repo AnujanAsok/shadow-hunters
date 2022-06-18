@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { supabase } from "../supabase_client";
 import "./Game.css";
+import { sixSidedDice, fourSidedDice } from "../utils";
 
 const GamePage = (props) => {
   const { roomCode, playerName } = props;
@@ -13,13 +14,17 @@ const GamePage = (props) => {
       (playerData) => playerData.name === attackTarget
     );
 
-    console.log("current Turn", currentTurnPlayer);
+    const sixDice = sixSidedDice();
+    const fourDice = fourSidedDice();
+    const diceDifference = sixDice - fourDice;
 
     if (targetPlayer !== undefined) {
-      const { data, error } = await supabase
-        .from("Players")
-        .update({ Hitpoints: targetPlayer.Hitpoints - 20 })
-        .eq("name", attackTarget);
+      if (diceDifference > 0) {
+        const { data, error } = await supabase
+          .from("Players")
+          .update({ Hitpoints: targetPlayer.Hitpoints - diceDifference })
+          .eq("name", attackTarget);
+      }
 
       const validTurn =
         currentTurnPlayer + 1 < totalPlayerData.length ? currentTurnPlayer : -1;
@@ -56,10 +61,6 @@ const GamePage = (props) => {
   }, [currentTurnPlayer, totalPlayerData]);
 
   const focusedPlayer = turnPlayer && turnPlayer.name === playerName;
-  console.log("total player data", totalPlayerData);
-  console.log("currentplayer", currentTurnPlayer);
-  console.log("turnPlayer", turnPlayer);
-  console.log("total player", focusedPlayer);
 
   const isPlayerEliminated = myPlayerData && myPlayerData.Hitpoints === 0;
 
@@ -108,7 +109,6 @@ const GamePage = (props) => {
     let turnSubscription = supabase
       .from("Rooms")
       .on("UPDATE", (payload) => {
-        console.log("turn payload", payload.new.turnTracker);
         setCurrentTurnPlayer(payload.new.turnTracker);
       })
       .subscribe();

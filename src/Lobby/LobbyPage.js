@@ -34,9 +34,6 @@ const LobbyPage = (props) => {
         }
       })
       .subscribe();
-    return () => {
-      supabase.removeSubscription(gameStatusUpdate);
-    };
   }, []);
 
   useEffect(() => {

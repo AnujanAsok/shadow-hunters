@@ -40,7 +40,7 @@ const PlayerList = (props) => {
       <table>
         {totalPlayerNames.map((playerNames) => (
           <tr className="tableBorder">
-            <td>{playerNames}</td>
+            <td key={playerNames}>{playerNames}</td>
             <td>Ready</td>
           </tr>
         ))}
