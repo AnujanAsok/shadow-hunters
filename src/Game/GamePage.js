@@ -50,7 +50,7 @@ const GamePage = (props) => {
           name: payload.new.name,
           Hitpoints: payload.new.Hitpoints > 0 ? payload.new.Hitpoints : 0,
         };
-      } else if (payload.table === "Players") {
+      } else {
         return playerData;
       }
     });
