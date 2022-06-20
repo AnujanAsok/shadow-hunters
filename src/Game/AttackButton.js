@@ -3,56 +3,14 @@ import { supabase } from "../supabase_client";
 import { generateSixSidedDice, generateFourSidedDice } from "../utils";
 
 const AttackButton = (props) => {
-  const [currentTurnPlayerIndex, setCurrentTurnPlayerIndex] = useState(0);
   const {
     totalPlayerData,
     roomCode,
     attackTarget,
     playerName,
     isPlayerEliminated,
-    setTotalPlayerData,
+    currentTurnPlayerIndex,
   } = props;
-
-  useEffect(() => {
-    const fetchHitpoints = async () => {
-      const { data } = await supabase
-        .from("Players")
-        .select("name, Hitpoints")
-        .order("id", { ascending: true })
-        .eq("roomID", roomCode);
-      const playerHp = data.map((playerData) => {
-        return { name: playerData.name, Hitpoints: playerData.Hitpoints };
-      });
-      setTotalPlayerData(playerHp);
-    };
-    fetchHitpoints();
-  }, []);
-
-  useEffect(() => {
-    let mySubscription = supabase
-      .from("Players")
-      .on("UPDATE", (payload) => {
-        setTotalPlayerData((currentState) =>
-          updateHitpointValues(currentState, payload)
-        );
-      })
-      .subscribe();
-    return () => {
-      supabase.removeSubscription(mySubscription);
-    };
-  }, []);
-
-  useEffect(() => {
-    let turnSubscription = supabase
-      .from("Rooms")
-      .on("UPDATE", (payload) => {
-        setCurrentTurnPlayerIndex(payload.new.turnNumber);
-      })
-      .subscribe();
-    return () => {
-      supabase.removeSubscription(turnSubscription);
-    };
-  }, []);
 
   const handleClick = async () => {
     const targetPlayer = totalPlayerData.find(
@@ -74,20 +32,6 @@ const AttackButton = (props) => {
         })
         .eq("roomID", roomCode);
     }
-  };
-
-  const updateHitpointValues = (currentState, payload) => {
-    const updateHitpoints = currentState.map((playerData) => {
-      if (payload.new.name === playerData.name) {
-        return {
-          name: payload.new.name,
-          Hitpoints: payload.new.Hitpoints > 0 ? payload.new.Hitpoints : 0,
-        };
-      } else if (payload.table === "Players") {
-        return playerData;
-      }
-    });
-    return updateHitpoints;
   };
 
   const currentTurnPlayer = useMemo(() => {
