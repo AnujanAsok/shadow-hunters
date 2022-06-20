@@ -36,7 +36,9 @@ const CreateRoomButton = (props) => {
 
   return (
     <div>
-      <button onClick={handleClick}>Create Room</button>
+      <button onClick={handleClick} className="button button3">
+        Create Room
+      </button>
       {isRoomTaken === true && <h3>Room creation , please try again</h3>}
     </div>
   );

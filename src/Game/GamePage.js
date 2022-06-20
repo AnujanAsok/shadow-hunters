@@ -1,29 +1,21 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
+import "./Game.css";
+import AttackButton from "./AttackButton";
 import { supabase } from "../supabase_client";
+import AttackTargetSelect from "./AttackTargetSelect";
 
 const GamePage = (props) => {
   const { roomCode, playerName } = props;
   const [totalPlayerData, setTotalPlayerData] = useState([]);
   const [attackTarget, setAttackTarget] = useState("Select a target");
-
-  const handleClick = async () => {
-    const targetPlayer = totalPlayerData.find(
-      (playerData) => playerData.name === attackTarget
-    );
-
-    if (targetPlayer !== undefined) {
-      const { data, error } = await supabase
-        .from("Players")
-        .update({ Hitpoints: targetPlayer.Hitpoints - 20 })
-        .eq("name", attackTarget);
-    }
-  };
+  const [currentTurnPlayerIndex, setCurrentTurnPlayerIndex] = useState(0);
 
   useEffect(() => {
     const fetchHitpoints = async () => {
-      const { data, error } = await supabase
+      const { data } = await supabase
         .from("Players")
         .select("name, Hitpoints")
+        .order("id", { ascending: true })
         .eq("roomID", roomCode);
       const playerHp = data.map((playerData) => {
         return { name: playerData.name, Hitpoints: playerData.Hitpoints };
@@ -32,7 +24,6 @@ const GamePage = (props) => {
     };
     fetchHitpoints();
   }, []);
-
   const myPlayerData = useMemo(() => {
     return totalPlayerData.find((playerData) => playerData.name === playerName);
   }, [totalPlayerData]);
@@ -80,39 +71,42 @@ const GamePage = (props) => {
     };
   }, []);
 
-  const filteredPlayerTargets = useMemo(
-    () =>
-      totalPlayerData.filter((playerData) => playerData.name !== playerName),
-    [totalPlayerData]
-  );
+  useEffect(() => {
+    let turnSubscription = supabase
+      .from("Rooms")
+      .on("UPDATE", (payload) => {
+        setCurrentTurnPlayerIndex(payload.new.turnNumber);
+      })
+      .subscribe();
+    return () => {
+      supabase.removeSubscription(turnSubscription);
+    };
+  }, []);
 
   return (
     <div>
-      <h1>This is the Game Page</h1>
-      <div>
-        <select
-          name="selectingAttackTarget"
-          id="selectingAttackTarget"
-          defaultValue={"Select a target"}
-          onChange={(e) => {
-            setAttackTarget(e.target.value);
-          }}
-        >
-          <option value={"Select a target"}>Select a target</option>
-          {filteredPlayerTargets.map((targetPlayers) => (
-            <option value={targetPlayers.name} key={targetPlayers.name}>
-              {targetPlayers.name} HitPoints: {targetPlayers.Hitpoints}
-            </option>
-          ))}
-        </select>
-        <button
-          onClick={handleClick}
-          disabled={attackTarget === "Select a target" || isPlayerEliminated}
-        >
-          Attack
-        </button>
-        {isPlayerEliminated === true && <h3>You are dead.</h3>}
-        {hasWon === true && <h3>You have won!</h3>}
+      <div className="inventoryContainer">Inventory:</div>
+      <div className="gamePageContainer">
+        <h1>This is the Game Page</h1>
+
+        <div>
+          <AttackTargetSelect
+            setAttackTarget={setAttackTarget}
+            totalPlayerData={totalPlayerData}
+            playerName={playerName}
+          />
+          <AttackButton
+            totalPlayerData={totalPlayerData}
+            roomCode={roomCode}
+            attackTarget={attackTarget}
+            playerName={playerName}
+            isPlayerEliminated={isPlayerEliminated}
+            setTotalPlayerData={setTotalPlayerData}
+            currentTurnPlayerIndex={currentTurnPlayerIndex}
+          />
+          {isPlayerEliminated === true && <h3>You are dead.</h3>}
+          {hasWon === true && <h3>You have won!</h3>}
+        </div>
       </div>
     </div>
   );

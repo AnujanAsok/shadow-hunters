@@ -7,3 +7,11 @@ export const generateRoomCode = () => {
   }
   return roomID;
 };
+
+export const generateSixSidedDice = () => {
+  return Math.floor(Math.random() * 6 + 1);
+};
+
+export const generateFourSidedDice = () => {
+  return Math.floor(Math.random() * 4 + 1);
+};
