@@ -8,10 +8,10 @@ export const generateRoomCode = () => {
   return roomID;
 };
 
-export const sixSidedDice = () => {
+export const generateSixSidedDice = () => {
   return Math.floor(Math.random() * 6 + 1);
 };
 
-export const fourSidedDice = () => {
+export const generateFourSidedDice = () => {
   return Math.floor(Math.random() * 4 + 1);
 };
