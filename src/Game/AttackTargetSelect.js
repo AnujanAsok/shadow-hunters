@@ -1,4 +1,5 @@
-import { useMemo } from "react";
+import { useEffect, useMemo } from "react";
+import { supabase } from "../supabase_client";
 
 const AttackTargetSelect = (props) => {
   const {
@@ -11,7 +12,6 @@ const AttackTargetSelect = (props) => {
   const filteredPlayerTargets = useMemo(
     () =>
       totalPlayerData.filter((playerData) => {
-        console.log(totalPlayerData);
         const locationDistance =
           playerData.locationID - currentPlayerLocationID;
         return (
@@ -20,8 +20,19 @@ const AttackTargetSelect = (props) => {
           (Math.abs(locationDistance) === 1 || locationDistance === 0)
         );
       }),
-    [totalPlayerData]
+    [totalPlayerData, currentPlayerLocationID]
   );
+
+  useEffect(() => {
+    //disable the attack button when no target is in the location
+    setAttackTarget((currentValue) => {
+      if (filteredPlayerTargets.length === 0) {
+        return "Select a target";
+      } else {
+        return currentValue;
+      }
+    });
+  }, [filteredPlayerTargets]);
 
   return (
     <div>

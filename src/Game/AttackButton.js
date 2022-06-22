@@ -10,7 +10,20 @@ const AttackButton = (props) => {
     playerName,
     isPlayerEliminated,
     currentTurnPlayerIndex,
+    currentTurnPlayer,
+    hasPlayerMovedLocations,
+    setHasPlayerMovedLocations,
   } = props;
+
+  const passTurn = async () => {
+    await supabase
+      .from("Rooms")
+      .update({
+        turnNumber: (currentTurnPlayerIndex + 1) % totalPlayerData.length,
+      })
+      .eq("roomID", roomCode);
+    setHasPlayerMovedLocations(false);
+  };
 
   const handleClick = async () => {
     const targetPlayer = totalPlayerData.find(
@@ -25,20 +38,9 @@ const AttackButton = (props) => {
           .update({ Hitpoints: targetPlayer.Hitpoints - diceDifference })
           .eq("name", attackTarget);
       }
-      await supabase
-        .from("Rooms")
-        .update({
-          turnNumber: (currentTurnPlayerIndex + 1) % totalPlayerData.length,
-        })
-        .eq("roomID", roomCode);
+      passTurn();
     }
   };
-
-  const currentTurnPlayer = useMemo(() => {
-    return totalPlayerData.find(
-      (playerData, index) => index === currentTurnPlayerIndex
-    );
-  }, [currentTurnPlayerIndex, totalPlayerData]);
 
   const isMyPlayersTurn =
     currentTurnPlayer && currentTurnPlayer.name === playerName;
@@ -50,10 +52,14 @@ const AttackButton = (props) => {
         disabled={
           attackTarget === "Select a target" ||
           isPlayerEliminated ||
-          !isMyPlayersTurn
+          !isMyPlayersTurn ||
+          !hasPlayerMovedLocations
         }
       >
         Attack
+      </button>
+      <button onClick={passTurn} disabled={!isMyPlayersTurn}>
+        Pass Turn
       </button>
     </div>
   );

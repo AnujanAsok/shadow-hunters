@@ -11,6 +11,7 @@ const GamePage = (props) => {
   const [attackTarget, setAttackTarget] = useState("Select a target");
   const [currentTurnPlayerIndex, setCurrentTurnPlayerIndex] = useState(0);
   const [currentPlayerLocationID, setCurrentPlayerLocationID] = useState(0);
+  const [hasPlayerMovedLocations, setHasPlayerMovedLocations] = useState(false);
 
   useEffect(() => {
     const fetchHitpoints = async () => {
@@ -20,7 +21,6 @@ const GamePage = (props) => {
         .order("id", { ascending: true })
         .eq("roomID", roomCode);
       const playerHp = data.map((playerData) => {
-        console.log("total player data", playerData);
         return {
           name: playerData.name,
           Hitpoints: playerData.Hitpoints,
@@ -31,8 +31,6 @@ const GamePage = (props) => {
     };
     fetchHitpoints();
   }, []);
-
-  useEffect(() => {}, [totalPlayerData]);
 
   const myPlayerData = useMemo(() => {
     return totalPlayerData.find((playerData) => playerData.name === playerName);
@@ -55,7 +53,6 @@ const GamePage = (props) => {
 
   const updateHitpointValues = (currentState, payload) => {
     const updateHitpoints = currentState.map((playerData) => {
-      console.log(payload);
       if (payload.new.name === playerData.name) {
         return {
           name: payload.new.name,
@@ -95,6 +92,12 @@ const GamePage = (props) => {
     };
   }, []);
 
+  const currentTurnPlayer = useMemo(() => {
+    return totalPlayerData.find(
+      (playerData, index) => index === currentTurnPlayerIndex
+    );
+  }, [currentTurnPlayerIndex, totalPlayerData]);
+
   return (
     <div>
       <div className="inventoryContainer">Inventory:</div>
@@ -114,16 +117,29 @@ const GamePage = (props) => {
             attackTarget={attackTarget}
             playerName={playerName}
             isPlayerEliminated={isPlayerEliminated}
-            setTotalPlayerData={setTotalPlayerData}
             currentTurnPlayerIndex={currentTurnPlayerIndex}
+            currentTurnPlayer={currentTurnPlayer}
+            hasPlayerMovedLocations={hasPlayerMovedLocations}
+            setHasPlayerMovedLocations={setHasPlayerMovedLocations}
           />
           <PlayerLocations
             playerName={playerName}
             setCurrentPlayerLocationID={setCurrentPlayerLocationID}
-            currentTurnPlayerIndex={currentTurnPlayerIndex}
+            currentTurnPlayer={currentTurnPlayer}
+            setHasPlayerMovedLocations={setHasPlayerMovedLocations}
+            hasPlayerMovedLocations={hasPlayerMovedLocations}
           />
           {isPlayerEliminated === true && <h3>You are dead.</h3>}
           {hasWon === true && <h3>You have won!</h3>}
+
+          <ol>
+            <li>Hermit Hut</li>
+            <li>Underworld Gate</li>
+            <li>Church</li>
+            <li>Cemetery</li>
+            <li>Wierd Woods</li>
+            <li>Erstwhile Altar</li>
+          </ol>
         </div>
       </div>
     </div>
