@@ -3,27 +3,37 @@ import "./Game.css";
 import AttackButton from "./AttackButton";
 import { supabase } from "../supabase_client";
 import AttackTargetSelect from "./AttackTargetSelect";
+import PlayerLocations from "./PlayerLocations";
 
 const GamePage = (props) => {
   const { roomCode, playerName } = props;
   const [totalPlayerData, setTotalPlayerData] = useState([]);
   const [attackTarget, setAttackTarget] = useState("Select a target");
   const [currentTurnPlayerIndex, setCurrentTurnPlayerIndex] = useState(0);
+  const [currentPlayerLocationID, setCurrentPlayerLocationID] = useState(0);
 
   useEffect(() => {
     const fetchHitpoints = async () => {
       const { data } = await supabase
         .from("Players")
-        .select("name, Hitpoints")
+        .select("name, Hitpoints, LocationID")
         .order("id", { ascending: true })
         .eq("roomID", roomCode);
       const playerHp = data.map((playerData) => {
-        return { name: playerData.name, Hitpoints: playerData.Hitpoints };
+        console.log("total player data", playerData);
+        return {
+          name: playerData.name,
+          Hitpoints: playerData.Hitpoints,
+          locationID: playerData.LocationID,
+        };
       });
       setTotalPlayerData(playerHp);
     };
     fetchHitpoints();
   }, []);
+
+  useEffect(() => {}, [totalPlayerData]);
+
   const myPlayerData = useMemo(() => {
     return totalPlayerData.find((playerData) => playerData.name === playerName);
   }, [totalPlayerData]);
@@ -45,10 +55,12 @@ const GamePage = (props) => {
 
   const updateHitpointValues = (currentState, payload) => {
     const updateHitpoints = currentState.map((playerData) => {
+      console.log(payload);
       if (payload.new.name === playerData.name) {
         return {
           name: payload.new.name,
           Hitpoints: payload.new.Hitpoints > 0 ? payload.new.Hitpoints : 0,
+          locationID: payload.new.LocationID,
         };
       } else {
         return playerData;
@@ -94,6 +106,7 @@ const GamePage = (props) => {
             setAttackTarget={setAttackTarget}
             totalPlayerData={totalPlayerData}
             playerName={playerName}
+            currentPlayerLocationID={currentPlayerLocationID}
           />
           <AttackButton
             totalPlayerData={totalPlayerData}
@@ -102,6 +115,11 @@ const GamePage = (props) => {
             playerName={playerName}
             isPlayerEliminated={isPlayerEliminated}
             setTotalPlayerData={setTotalPlayerData}
+            currentTurnPlayerIndex={currentTurnPlayerIndex}
+          />
+          <PlayerLocations
+            playerName={playerName}
+            setCurrentPlayerLocationID={setCurrentPlayerLocationID}
             currentTurnPlayerIndex={currentTurnPlayerIndex}
           />
           {isPlayerEliminated === true && <h3>You are dead.</h3>}

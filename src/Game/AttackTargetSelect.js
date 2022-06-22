@@ -1,12 +1,28 @@
 import { useMemo } from "react";
 
 const AttackTargetSelect = (props) => {
-  const { setAttackTarget, totalPlayerData, playerName } = props;
+  const {
+    setAttackTarget,
+    totalPlayerData,
+    playerName,
+    currentPlayerLocationID,
+  } = props;
+
   const filteredPlayerTargets = useMemo(
     () =>
-      totalPlayerData.filter((playerData) => playerData.name !== playerName),
+      totalPlayerData.filter((playerData) => {
+        console.log(totalPlayerData);
+        const locationDistance =
+          playerData.locationID - currentPlayerLocationID;
+        return (
+          playerData.name !== playerName &&
+          playerData.locationID &&
+          (Math.abs(locationDistance) === 1 || locationDistance === 0)
+        );
+      }),
     [totalPlayerData]
   );
+
   return (
     <div>
       <select
