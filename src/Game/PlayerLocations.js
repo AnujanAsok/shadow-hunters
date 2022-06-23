@@ -17,10 +17,9 @@ const PlayerLocations = (props) => {
     setPlayerLocationChoice(e.target.value);
   };
 
-  const handleClick = async () => {
+  const randomLocationSelector = () => {
     const diceSum = generateSixSidedDice() + generateFourSidedDice();
     let locationID = 0;
-    let isRollSeven = false;
 
     if (diceSum === 1 || diceSum === 2) {
       locationID = 1;
@@ -28,8 +27,6 @@ const PlayerLocations = (props) => {
       locationID = 2;
     } else if (diceSum === 6) {
       locationID = 3;
-    } else if (diceSum === 7) {
-      isRollSeven = true;
     } else if (diceSum === 8) {
       locationID = 4;
     } else if (diceSum === 9) {
@@ -37,40 +34,43 @@ const PlayerLocations = (props) => {
     } else if (diceSum === 10) {
       locationID = 6;
     }
+
+    return locationID;
+  };
+
+  const handleClick = async () => {
+    const locationID = randomLocationSelector();
     if (locationID !== 0) {
       await supabase
         .from("Players")
-        .update({ LocationID: locationID })
+        .update({ locationID: locationID })
         .match({ name: playerName });
     }
 
     setCurrentPlayerLocationID((currentValue) => {
       //this occurs when the player rolls a 7
-
-      if (locationID === 0) {
-        return currentValue;
-      } else {
-        return locationID;
-      }
+      const newLocationID = locationID === 0 ? currentValue : locationID;
+      return newLocationID;
     });
     setHasPlayerMovedLocations(() => {
-      if (locationID === 0) {
-        return false;
-      } else {
-        return true;
-      }
+      const checkIfPlayerMoved = locationID === 0 ? "location" : "attack";
+      console.log(" check if player moved ", checkIfPlayerMoved);
+      return checkIfPlayerMoved;
     });
-    setHasPlayerRolledSeven(isRollSeven);
+    setHasPlayerRolledSeven(() => {
+      const playerRolledSeven = locationID === 0 ? true : false;
+      return playerRolledSeven;
+    });
   };
 
-  const handleLocationInput = async () => {
+  const handleManualLocationClicked = async () => {
     await supabase
       .from("Players")
-      .update({ LocationID: playerLocationChoice })
+      .update({ locationID: playerLocationChoice })
       .match({ name: playerName });
     setHasPlayerRolledSeven(false);
     setCurrentPlayerLocationID(playerLocationChoice);
-    setHasPlayerMovedLocations(true);
+    setHasPlayerMovedLocations("attack");
   };
 
   const isMyPlayersTurn =
@@ -80,21 +80,24 @@ const PlayerLocations = (props) => {
     <div>
       <button
         onClick={handleClick}
-        disabled={!isMyPlayersTurn || hasPlayerMovedLocations}
+        disabled={
+          !isMyPlayersTurn ||
+          hasPlayerMovedLocations === "attack" ||
+          hasPlayerRolledSeven
+        }
       >
-        Roll Dice
+        Attempt to relocate
       </button>
-      <div>
-        <input
-          type={"text"}
-          onChange={handleChange}
-          placeholder="enter location number"
-          disabled={!hasPlayerRolledSeven}
-        />
-        <button onClick={handleLocationInput} disabled={!hasPlayerRolledSeven}>
-          Enter Location
-        </button>
-      </div>
+      {hasPlayerRolledSeven && (
+        <div>
+          <input
+            type="text"
+            onChange={handleChange}
+            placeholder="enter location number"
+          />
+          <button onClick={handleManualLocationClicked}>Enter Location</button>
+        </div>
+      )}
     </div>
   );
 };

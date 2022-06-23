@@ -12,27 +12,16 @@ const AttackTargetSelect = (props) => {
   const filteredPlayerTargets = useMemo(
     () =>
       totalPlayerData.filter((playerData) => {
-        const locationDistance =
+        const distanceFromTarget =
           playerData.locationID - currentPlayerLocationID;
         return (
           playerData.name !== playerName &&
           playerData.locationID &&
-          (Math.abs(locationDistance) === 1 || locationDistance === 0)
+          (Math.abs(distanceFromTarget) === 1 || distanceFromTarget === 0)
         );
       }),
     [totalPlayerData, currentPlayerLocationID]
   );
-
-  useEffect(() => {
-    //disable the attack button when no target is in the location
-    setAttackTarget((currentValue) => {
-      if (filteredPlayerTargets.length === 0) {
-        return "Select a target";
-      } else {
-        return currentValue;
-      }
-    });
-  }, [filteredPlayerTargets]);
 
   return (
     <div>
@@ -44,10 +33,12 @@ const AttackTargetSelect = (props) => {
           setAttackTarget(e.target.value);
         }}
       >
-        <option value={"Select a target"}>Select a target</option>
+        <option value={"Select a target"} selected>
+          Select a target
+        </option>
         {filteredPlayerTargets.map((targetPlayers) => (
           <option value={targetPlayers.name} key={targetPlayers.name}>
-            {targetPlayers.name} HitPoints: {targetPlayers.Hitpoints}
+            {targetPlayers.name} hp: {targetPlayers.hitpoints}
           </option>
         ))}
       </select>
