@@ -124,6 +124,7 @@ const GamePage = (props) => {
             currentPlayerLocationID={currentPlayerLocationID}
             currentTurnPlayerIndex={currentTurnPlayerIndex}
             currentTurnPlayer={currentTurnPlayer}
+            attackTarget={attackTarget}
           />
           <PlayerLocations
             playerName={playerName}

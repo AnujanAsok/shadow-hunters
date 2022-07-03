@@ -23,6 +23,7 @@ const PlayerList = (props) => {
     let mySubscription = supabase
       .from("Players")
       .on("UPDATE", (payload) => {
+        console.log("in room update");
         if (payload.new.roomID === roomCode) {
           setTotalPlayerNames((totalPlayerNames) =>
             totalPlayerNames.concat(payload.new.name)
@@ -35,12 +36,24 @@ const PlayerList = (props) => {
   return (
     <div className="playerListContainer">
       <table>
-        {totalPlayerNames.map((playerNames) => (
-          <tr className="tableBorder">
-            <td key={playerNames}>{playerNames}</td>
-            <td>Ready</td>
+        <thead>
+          <tr>
+            <td>
+              <strong>Name</strong>
+            </td>
+            <td>
+              <strong>Status</strong>
+            </td>
           </tr>
-        ))}
+        </thead>
+        <tbody>
+          {totalPlayerNames.map((playerNames) => (
+            <tr className="tableBorder">
+              <td key={playerNames}>{playerNames}</td>
+              <td>Ready</td>
+            </tr>
+          ))}
+        </tbody>
       </table>
     </div>
   );

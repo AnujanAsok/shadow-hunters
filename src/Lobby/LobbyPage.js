@@ -15,7 +15,7 @@ const LobbyPage = (props) => {
   const [hasGameStarted, setHasGameStarted] = useState(false);
 
   const handleClick = async () => {
-    const { data, error } = await supabase
+    await supabase
       .from("Rooms")
       .update({ gameStatus: true })
       .match({ roomID: roomCode });
