@@ -1,28 +1,12 @@
-import { useEffect, useMemo } from "react";
-import { supabase } from "../supabase_client";
+import { useMemo } from "react";
 
 const AttackTargetSelect = (props) => {
-  const {
-    setAttackTarget,
-    totalPlayerData,
-    playerName,
-    currentPlayerLocationID,
-  } = props;
-
+  const { setAttackTarget, totalPlayerData, playerName } = props;
   const filteredPlayerTargets = useMemo(
     () =>
-      totalPlayerData.filter((playerData) => {
-        const distanceFromTarget =
-          playerData.locationID - currentPlayerLocationID;
-        return (
-          playerData.name !== playerName &&
-          playerData.locationID &&
-          (Math.abs(distanceFromTarget) === 1 || distanceFromTarget === 0)
-        );
-      }),
-    [totalPlayerData, currentPlayerLocationID]
+      totalPlayerData.filter((playerData) => playerData.name !== playerName),
+    [totalPlayerData]
   );
-
   return (
     <div>
       <select
@@ -33,12 +17,10 @@ const AttackTargetSelect = (props) => {
           setAttackTarget(e.target.value);
         }}
       >
-        <option value={"Select a target"} selected>
-          Select a target
-        </option>
+        <option value={"Select a target"}>Select a target</option>
         {filteredPlayerTargets.map((targetPlayers) => (
           <option value={targetPlayers.name} key={targetPlayers.name}>
-            {targetPlayers.name} hp: {targetPlayers.hitpoints}
+            {targetPlayers.name} HitPoints: {targetPlayers.Hitpoints}
           </option>
         ))}
       </select>
