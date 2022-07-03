@@ -10,7 +10,20 @@ const AttackButton = (props) => {
     playerName,
     isPlayerEliminated,
     currentTurnPlayerIndex,
+    currentTurnPlayer,
+    hasPlayerMovedLocations,
+    setHasPlayerMovedLocations,
   } = props;
+
+  const endTurn = async () => {
+    await supabase
+      .from("Rooms")
+      .update({
+        turnNumber: (currentTurnPlayerIndex + 1) % totalPlayerData.length,
+      })
+      .eq("roomID", roomCode);
+    setHasPlayerMovedLocations("location");
+  };
 
   const handleClick = async () => {
     const targetPlayer = totalPlayerData.find(
@@ -22,26 +35,19 @@ const AttackButton = (props) => {
       if (diceDifference > 0) {
         await supabase
           .from("Players")
-          .update({ Hitpoints: targetPlayer.Hitpoints - diceDifference })
+          .update({ hitpoints: targetPlayer.hitpoints - diceDifference })
           .eq("name", attackTarget);
       }
-      await supabase
-        .from("Rooms")
-        .update({
-          turnNumber: (currentTurnPlayerIndex + 1) % totalPlayerData.length,
-        })
-        .eq("roomID", roomCode);
+      endTurn();
     }
   };
 
-  const currentTurnPlayer = useMemo(() => {
-    return totalPlayerData.find(
-      (playerData, index) => index === currentTurnPlayerIndex
-    );
-  }, [currentTurnPlayerIndex, totalPlayerData]);
-
   const isMyPlayersTurn =
     currentTurnPlayer && currentTurnPlayer.name === playerName;
+
+  console.log("attack target", attackTarget);
+  console.log("ismyplayerturn ", !isMyPlayersTurn);
+  console.log("has player moved", hasPlayerMovedLocations);
 
   return (
     <div>
@@ -50,10 +56,14 @@ const AttackButton = (props) => {
         disabled={
           attackTarget === "Select a target" ||
           isPlayerEliminated ||
-          !isMyPlayersTurn
+          !isMyPlayersTurn ||
+          hasPlayerMovedLocations === "location"
         }
       >
         Attack
+      </button>
+      <button onClick={endTurn} disabled={!isMyPlayersTurn}>
+        Pass Turn
       </button>
     </div>
   );
