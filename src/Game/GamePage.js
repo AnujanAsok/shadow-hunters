@@ -3,36 +3,38 @@ import "./Game.css";
 import AttackButton from "./AttackButton";
 import { supabase } from "../supabase_client";
 import AttackTargetSelect from "./AttackTargetSelect";
+import PlayerLocations from "./PlayerLocations";
 
 const GamePage = (props) => {
   const { roomCode, playerName } = props;
   const [totalPlayerData, setTotalPlayerData] = useState([]);
   const [attackTarget, setAttackTarget] = useState("Select a target");
   const [currentTurnPlayerIndex, setCurrentTurnPlayerIndex] = useState(0);
+  const [currentPlayerLocationID, setCurrentPlayerLocationID] = useState(0);
+  const [hasPlayerMovedLocations, setHasPlayerMovedLocations] = useState("");
+  const [locationName, setLocationName] = useState("Not at a valid location");
 
   useEffect(() => {
-    const fetchHitpoints = async () => {
+    const fetchPlayerData = async () => {
       const { data } = await supabase
         .from("Players")
-        .select("name, Hitpoints")
+        .select("name, hitpoints, locationID")
         .order("id", { ascending: true })
         .eq("roomID", roomCode);
-      const playerHp = data.map((playerData) => {
-        return { name: playerData.name, Hitpoints: playerData.Hitpoints };
-      });
-      setTotalPlayerData(playerHp);
+      setTotalPlayerData(data);
     };
-    fetchHitpoints();
+    fetchPlayerData();
   }, []);
+
   const myPlayerData = useMemo(() => {
     return totalPlayerData.find((playerData) => playerData.name === playerName);
   }, [totalPlayerData]);
 
-  const isPlayerEliminated = myPlayerData && myPlayerData.Hitpoints === 0;
+  const isPlayerEliminated = myPlayerData && myPlayerData.hitpoints === 0;
 
   const checkWinCondition = () => {
     const eliminatedPlayers = totalPlayerData.filter(
-      (playerData) => playerData.Hitpoints === 0
+      (playerData) => playerData.hitpoints === 0
     );
     return (
       eliminatedPlayers.length === totalPlayerData.length - 1 &&
@@ -43,12 +45,13 @@ const GamePage = (props) => {
 
   const hasWon = useMemo(checkWinCondition, [totalPlayerData]);
 
-  const updateHitpointValues = (currentState, payload) => {
+  const updatePlayerData = (currentState, payload) => {
     const updateHitpoints = currentState.map((playerData) => {
       if (payload.new.name === playerData.name) {
         return {
           name: payload.new.name,
-          Hitpoints: payload.new.Hitpoints > 0 ? payload.new.Hitpoints : 0,
+          hitpoints: payload.new.hitpoints > 0 ? payload.new.hitpoints : 0,
+          locationID: payload.new.locationID,
         };
       } else {
         return playerData;
@@ -62,7 +65,7 @@ const GamePage = (props) => {
       .from("Players")
       .on("UPDATE", (payload) => {
         setTotalPlayerData((currentState) =>
-          updateHitpointValues(currentState, payload)
+          updatePlayerData(currentState, payload)
         );
       })
       .subscribe();
@@ -83,6 +86,30 @@ const GamePage = (props) => {
     };
   }, []);
 
+  const currentTurnPlayer = useMemo(() => {
+    return totalPlayerData.find(
+      (playerData, index) => index === currentTurnPlayerIndex
+    );
+  }, [currentTurnPlayerIndex, totalPlayerData]);
+
+  const fetchLocationName = async () => {
+    const { data } = await supabase
+      .from("Locations")
+      .select("location")
+      .eq("locationID", currentPlayerLocationID);
+
+    setLocationName((currentValue) => {
+      const validatePlayerLocation =
+        data[0] === undefined ? currentValue : data[0].location;
+      return validatePlayerLocation;
+    });
+  };
+
+  useEffect(() => {
+    fetchLocationName();
+  }, [currentPlayerLocationID]);
+
+  console.log(locationName);
   return (
     <div>
       <div className="inventoryContainer">Inventory:</div>
@@ -94,18 +121,42 @@ const GamePage = (props) => {
             setAttackTarget={setAttackTarget}
             totalPlayerData={totalPlayerData}
             playerName={playerName}
+            currentPlayerLocationID={currentPlayerLocationID}
+            currentTurnPlayerIndex={currentTurnPlayerIndex}
+            currentTurnPlayer={currentTurnPlayer}
           />
+          <PlayerLocations
+            playerName={playerName}
+            setCurrentPlayerLocationID={setCurrentPlayerLocationID}
+            currentTurnPlayer={currentTurnPlayer}
+            setHasPlayerMovedLocations={setHasPlayerMovedLocations}
+            hasPlayerMovedLocations={hasPlayerMovedLocations}
+            setAttackTarget={setAttackTarget}
+          />
+          <div> You are in location: {locationName}</div>
           <AttackButton
             totalPlayerData={totalPlayerData}
             roomCode={roomCode}
             attackTarget={attackTarget}
             playerName={playerName}
             isPlayerEliminated={isPlayerEliminated}
-            setTotalPlayerData={setTotalPlayerData}
             currentTurnPlayerIndex={currentTurnPlayerIndex}
+            currentTurnPlayer={currentTurnPlayer}
+            hasPlayerMovedLocations={hasPlayerMovedLocations}
+            setHasPlayerMovedLocations={setHasPlayerMovedLocations}
           />
+
           {isPlayerEliminated === true && <h3>You are dead.</h3>}
           {hasWon === true && <h3>You have won!</h3>}
+
+          <ol>
+            <li>Hermit Hut</li>
+            <li>Underworld Gate</li>
+            <li>Church</li>
+            <li>Cemetery</li>
+            <li>Wierd Woods</li>
+            <li>Erstwhile Altar</li>
+          </ol>
         </div>
       </div>
     </div>
