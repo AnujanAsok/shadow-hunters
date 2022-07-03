@@ -144,7 +144,7 @@ const GamePage = (props) => {
             currentTurnPlayerIndex={currentTurnPlayerIndex}
             currentTurnPlayer={currentTurnPlayer}
             hasPlayerMovedLocations={hasPlayerMovedLocations}
-            setHasPlayerMovedLocations={setHasPlayerMovedLocations}
+            setHasPlayerMovedLocations={setHasPlayerMovedLocations} //fixing a merge error
           />
 
           {isPlayerEliminated === true && <h3>You are dead.</h3>}
