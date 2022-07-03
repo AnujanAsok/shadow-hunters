@@ -30,6 +30,9 @@ const PlayerList = (props) => {
         }
       })
       .subscribe();
+    return () => {
+      supabase.removeSubscription(mySubscription);
+    };
   }, []);
 
   return (
