@@ -7,6 +7,7 @@ const AttackTargetSelect = (props) => {
     totalPlayerData,
     playerName,
     currentPlayerLocationID,
+    attackTarget,
   } = props;
 
   const filteredPlayerTargets = useMemo(
@@ -23,12 +24,16 @@ const AttackTargetSelect = (props) => {
     [totalPlayerData, currentPlayerLocationID]
   );
 
+  useEffect(() => {
+    setAttackTarget("Select a target");
+  }, [currentPlayerLocationID]);
+
   return (
     <div>
       <select
         name="selectingAttackTarget"
         id="selectingAttackTarget"
-        defaultValue={"Select a target"}
+        defaultValue={attackTarget}
         onChange={(e) => {
           setAttackTarget(e.target.value);
         }}

@@ -21,7 +21,7 @@ const PlayerLocations = (props) => {
     const diceSum = generateSixSidedDice() + generateFourSidedDice();
     let locationID = 0;
 
-    if (diceSum === 1 || diceSum === 2) {
+    if (diceSum === 2 || diceSum === 3) {
       locationID = 1;
     } else if (diceSum === 4 || diceSum === 5) {
       locationID = 2;
@@ -54,7 +54,6 @@ const PlayerLocations = (props) => {
     });
     setHasPlayerMovedLocations(() => {
       const checkIfPlayerMoved = locationID === 0 ? "location" : "attack";
-      console.log(" check if player moved ", checkIfPlayerMoved);
       return checkIfPlayerMoved;
     });
     setHasPlayerRolledSeven(() => {

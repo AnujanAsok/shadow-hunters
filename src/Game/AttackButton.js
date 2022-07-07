@@ -13,6 +13,8 @@ const AttackButton = (props) => {
     currentTurnPlayer,
     hasPlayerMovedLocations,
     setHasPlayerMovedLocations,
+    setHasPlayerDrawnCard,
+    hasPlayerDrawnCard,
   } = props;
 
   const endTurn = async () => {
@@ -23,6 +25,7 @@ const AttackButton = (props) => {
       })
       .eq("roomID", roomCode);
     setHasPlayerMovedLocations("location");
+    setHasPlayerDrawnCard(false);
   };
 
   const handleClick = async () => {
@@ -45,10 +48,6 @@ const AttackButton = (props) => {
   const isMyPlayersTurn =
     currentTurnPlayer && currentTurnPlayer.name === playerName;
 
-  console.log("attack target", attackTarget);
-  console.log("ismyplayerturn ", !isMyPlayersTurn);
-  console.log("has player moved", hasPlayerMovedLocations);
-
   return (
     <div>
       <button
@@ -62,7 +61,10 @@ const AttackButton = (props) => {
       >
         Attack
       </button>
-      <button onClick={endTurn} disabled={!isMyPlayersTurn}>
+      <button
+        onClick={endTurn}
+        disabled={!isMyPlayersTurn || hasPlayerDrawnCard === false}
+      >
         Pass Turn
       </button>
     </div>
