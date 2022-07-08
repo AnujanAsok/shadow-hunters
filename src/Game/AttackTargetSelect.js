@@ -38,9 +38,7 @@ const AttackTargetSelect = (props) => {
           setAttackTarget(e.target.value);
         }}
       >
-        <option value={"Select a target"} selected>
-          Select a target
-        </option>
+        <option value={"Select a target"}>Select a target</option>
         {filteredPlayerTargets.map((targetPlayers) => (
           <option value={targetPlayers.name} key={targetPlayers.name}>
             {targetPlayers.name} hp: {targetPlayers.hitpoints}

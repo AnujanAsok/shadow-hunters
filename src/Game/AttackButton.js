@@ -45,8 +45,7 @@ const AttackButton = (props) => {
     }
   };
 
-  const isMyPlayersTurn =
-    currentTurnPlayer && currentTurnPlayer.name === playerName;
+  const isMyPlayersTurn = currentTurnPlayer?.name === playerName;
 
   return (
     <div>

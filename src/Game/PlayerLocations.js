@@ -72,8 +72,7 @@ const PlayerLocations = (props) => {
     setHasPlayerMovedLocations("attack");
   };
 
-  const isMyPlayersTurn =
-    currentTurnPlayer && currentTurnPlayer.name === playerName;
+  const isMyPlayersTurn = currentTurnPlayer?.name === playerName;
 
   return (
     <div>

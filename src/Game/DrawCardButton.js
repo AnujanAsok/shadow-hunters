@@ -25,21 +25,16 @@ const DrawCardButton = (props) => {
     fetchLocationSpecificCards();
   }, [currentPlayerLocationID]);
 
-  const randomCard = useMemo(() => {
-    return availableCardsList[
-      Math.floor(Math.random() * availableCardsList.length)
-    ];
-  }, [availableCardsList]);
-
   const sendCardToInventory = async () => {
+    const randomCard =
+      availableCardsList[Math.floor(Math.random() * availableCardsList.length)];
     await supabase
       .from("PlayersToCardList")
       .insert([{ playerID: myPlayerData.playerID, cardID: randomCard.cardID }]);
     setHasPlayerDrawnCard(true);
   };
 
-  const isMyPlayersTurn =
-    currentTurnPlayer && currentTurnPlayer.name === playerName;
+  const isMyPlayersTurn = currentTurnPlayer?.name === playerName;
 
   return (
     <div>

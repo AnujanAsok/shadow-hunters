@@ -4,42 +4,38 @@ import { useEffect, useState } from "react";
 const InventoryList = (props) => {
   const { myPlayerData } = props;
   const [playerInventory, setplayerInventory] = useState([]);
-  const [newCollectedCardID, setNewCollectedCardID] = useState(0);
+  const [newCardInfo, setNewCardInfo] = useState([]);
 
   const fetchCardInfo = async () => {
-    const { data } = await supabase
-      .from("CardList")
-      .select("*")
-      .eq("cardID", newCollectedCardID);
-
-    setplayerInventory(() => playerInventory.concat(data));
+    let cardInfo = null;
+    if (myPlayerData && newCardInfo.new.playerID === myPlayerData.playerID) {
+      const { data } = await supabase
+        .from("CardList")
+        .select("*")
+        .eq("cardID", newCardInfo.new.cardID);
+      cardInfo = data;
+    }
+    setplayerInventory((currentInventory) =>
+      cardInfo !== null ? currentInventory.concat(cardInfo) : currentInventory
+    );
   };
 
   useEffect(() => {
     let mySubscription = supabase
       .from("PlayersToCardList")
       .on("INSERT", (payload) => {
-        let cardID = 0;
-        if (payload.new.playerID === myPlayerData.playerID) {
-          cardID = payload.new.cardID;
-        }
-        setNewCollectedCardID(cardID);
+        setNewCardInfo(payload);
       })
       .subscribe();
+
     return () => {
       supabase.removeSubscription(mySubscription);
     };
-  }, [myPlayerData]);
+  }, []);
 
   useEffect(() => {
     fetchCardInfo();
-  }, [newCollectedCardID]);
-
-  useEffect(() => {
-    if (newCollectedCardID !== 0) {
-      fetchCardInfo();
-    }
-  }, [newCollectedCardID]);
+  }, [newCardInfo]);
 
   return (
     <div>
