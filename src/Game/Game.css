@@ -49,3 +49,11 @@ select {
     background-color: #555555;
     color: white;
   }
+
+  td{
+    text-align: center;
+  }
+
+  thead{
+    text-decoration: underline;
+  }

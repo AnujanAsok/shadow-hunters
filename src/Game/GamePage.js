@@ -4,6 +4,8 @@ import AttackButton from "./AttackButton";
 import { supabase } from "../supabase_client";
 import AttackTargetSelect from "./AttackTargetSelect";
 import PlayerLocations from "./PlayerLocations";
+import DrawCardButton from "./DrawCardButton";
+import InventoryList from "./InventoryList";
 
 const GamePage = (props) => {
   const { roomCode, playerName } = props;
@@ -11,15 +13,17 @@ const GamePage = (props) => {
   const [attackTarget, setAttackTarget] = useState("Select a target");
   const [currentTurnPlayerIndex, setCurrentTurnPlayerIndex] = useState(0);
   const [currentPlayerLocationID, setCurrentPlayerLocationID] = useState(0);
-  const [hasPlayerMovedLocations, setHasPlayerMovedLocations] = useState("");
+  const [hasPlayerMovedLocations, setHasPlayerMovedLocations] =
+    useState("location");
+  const [hasPlayerDrawnCard, setHasPlayerDrawnCard] = useState(false);
   const [locationName, setLocationName] = useState("Not at a valid location");
 
   useEffect(() => {
     const fetchPlayerData = async () => {
       const { data } = await supabase
         .from("Players")
-        .select("name, hitpoints, locationID")
-        .order("id", { ascending: true })
+        .select("playerID, name, hitpoints, locationID")
+        .order("playerID", { ascending: true })
         .eq("roomID", roomCode);
       setTotalPlayerData(data);
     };
@@ -49,6 +53,7 @@ const GamePage = (props) => {
     const updateHitpoints = currentState.map((playerData) => {
       if (payload.new.name === playerData.name) {
         return {
+          playerID: payload.new.playerID,
           name: payload.new.name,
           hitpoints: payload.new.hitpoints > 0 ? payload.new.hitpoints : 0,
           locationID: payload.new.locationID,
@@ -109,7 +114,6 @@ const GamePage = (props) => {
     fetchLocationName();
   }, [currentPlayerLocationID]);
 
-  console.log(locationName);
   return (
     <div>
       <div className="inventoryContainer">Inventory:</div>
@@ -144,8 +148,20 @@ const GamePage = (props) => {
             currentTurnPlayerIndex={currentTurnPlayerIndex}
             currentTurnPlayer={currentTurnPlayer}
             hasPlayerMovedLocations={hasPlayerMovedLocations}
-            setHasPlayerMovedLocations={setHasPlayerMovedLocations} //fixing a merge error
+            setHasPlayerMovedLocations={setHasPlayerMovedLocations}
+            setHasPlayerDrawnCard={setHasPlayerDrawnCard}
+            hasPlayerDrawnCard={hasPlayerDrawnCard}
           />
+          <DrawCardButton
+            currentPlayerLocationID={currentPlayerLocationID}
+            myPlayerData={myPlayerData}
+            currentTurnPlayer={currentTurnPlayer}
+            playerName={playerName}
+            hasPlayerMovedLocations={hasPlayerMovedLocations}
+            setHasPlayerDrawnCard={setHasPlayerDrawnCard}
+            hasPlayerDrawnCard={hasPlayerDrawnCard}
+          />
+          <InventoryList playerName={playerName} myPlayerData={myPlayerData} />
 
           {isPlayerEliminated === true && <h3>You are dead.</h3>}
           {hasWon === true && <h3>You have won!</h3>}
